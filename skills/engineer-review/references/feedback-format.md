@@ -102,6 +102,7 @@ If **Needs clarification** is non-empty, end with the clarify HITL (skill `hitl-
 
 ## Anti-patterns (block emit)
 
+- Clarify / HITL whose Options only reconfirm a loaded kit or project rule (must be Fixed instead)
 - Any finding without a code fence of real source
 - Any finding without Jump / File links
 - Any finding without **Context**

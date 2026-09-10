@@ -74,6 +74,7 @@ Pass URLs into clarifications for `csp-review-figma-markup`. Do not block other 
 ## Fix policy
 
 - Apply immediately: unambiguous **P0/P1** that also passes [`references/auto-fix-eligibility.md`](references/auto-fix-eligibility.md) (bugs, dead code, obsolete historical comments, clear pattern violations, reinvented helpers).
+- **Rule already answers:** if a loaded kit/project checklist, skill, or rule mandates the fix → Fixed / auto-apply (eligibility Yes) — **never** Needs clarification HITL to reconfirm that policy (comments domain-only and every other rule-mandated class).
 - **P2** → Residual notes only.
 - Clarify first: behavior/API/product/design/security tradeoffs, risky deletions, spec/diff traceability mismatches, anything without clear evidence or that fails the eligibility test.
 
