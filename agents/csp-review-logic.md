@@ -63,6 +63,12 @@ When triggered: **open the full checklist** `skills/engineer-review/references/n
 
 When triggered: **open the full checklist** `skills/engineer-review/references/empty-collection-fail-close-checklist.md` and apply **FC1**. Coverage must note `empty_fail_close: both-shapes|one-shape|skipped|n/a` when this trigger applies.
 
+### Nested WebView scroll (W1, when triggered)
+
+**Trigger:** stack is `react-native` (or Expo) **and** the diff adds or changes a `WebView` / `react-native-webview` usage, **or** a `ScrollView` / `FlatList` / `SectionList` that wraps a `WebView`.
+
+When triggered: **open the full checklist** `skills/engineer-review/references/rn-nested-scroll-checklist.md` and apply **W1**. Coverage must note `nested_webview_scroll: single-scroller|nested|skipped|n/a` when this trigger applies.
+
 ## Output
 
 Follow `skills/engineer-review/references/phase-protocol.md` and `phase-protocol-detail.md`.  
