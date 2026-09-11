@@ -70,6 +70,12 @@ When triggered: **open the full checklist** `skills/engineer-review/references/o
 
 When triggered: **open the full checklist** `skills/engineer-review/references/empty-collection-fail-close-checklist.md` and apply **FC1**. Coverage must note `empty_fail_close: both-shapes|one-shape|skipped|n/a` when this trigger applies.
 
+### Iframe-hosted document paging (D1–D2, when triggered)
+
+**Trigger:** a native WebView (or equivalent) loads a remote/local HTML URL, **or** the hosted page (this repo or a related/sibling renderer) embeds a PDF or other paginated document in an iframe.
+
+When triggered: **open the full checklist** `skills/engineer-review/references/iframe-document-paging-checklist.md` and apply **D1–D2**. Coverage must note `iframe_document_paging: paging+variants|one-shape|skipped|n/a` when this trigger applies. Distinct from nested native `ScrollView` + `WebView` (outer scroller steals pan).
+
 ## Output
 
 Follow `skills/engineer-review/references/phase-protocol.md` and `phase-protocol-detail.md`.  
