@@ -462,3 +462,31 @@ source: teach-review
 Mechanism: Excel and React styling/layout fixes (lighter gray, borders, graph mask opacity, palette pad, mobile footer order, attach spacing) invite hex-/stylesheet-/`sx`-/DOM-order-pinning tests that churn on every design tweak and do not protect domain rules (when to gray a row or show an offline band, omit a column, treat online=0, mutation payloads, guards). Consumer `testing-conventions` that still showcase `describe("rendering")` must not override T1.
 
 Required check: [business-logic-tests-checklist.md](business-logic-tests-checklist.md) **T1** (explicitly includes React / Jest / Testing Library).
+### `miss_ordered-fallback-primary-first`
+
+```yaml
+id: miss_ordered-fallback-primary-first
+miss_class: ordered-fallback-primary-first
+triggers:
+  - fallback | locale A then B | catalog primary then secondary
+  - translation key-set | empty stub translator | hasPrimaryEntry
+  - dialog host | installation type | page context forces secondary
+  - secondary wins while primary entry exists
+phases: [logic]
+gate: OF1
+rule_one_liner: >-
+  When an ordered fallback prefers primary then secondary, secondary may
+  win only if primary has no real entry — never via empty primary stubs,
+  page context, or installation/device type while primary exists.
+anti_pattern: >-
+  Empty primary stub so secondary always wins on secondary pages; or
+  choosing a secondary dialog/host from installation type while a primary
+  translation/entry still exists.
+hits: 1
+last_seen: 2026-09-15
+source: teach-review
+```
+
+Mechanism: review accepts forcing the secondary catalog/locale/host because of page or installation context, even though the product rule is primary-first and secondary is only a gap-fill.
+
+Required check: [ordered-fallback-primary-first-checklist.md](ordered-fallback-primary-first-checklist.md) **OF1**.
