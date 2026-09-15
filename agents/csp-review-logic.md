@@ -57,6 +57,13 @@ When triggered: **open the full checklist** `skills/engineer-review/references/j
 
 When triggered: **open the full checklist** `skills/engineer-review/references/null-safety-checklist.md` and apply **N1**. Coverage must note `null_safety_callers: traced|partial|skipped|n/a` when this trigger applies.
 
+
+### Ordered fallback — primary first (OF1, when triggered)
+
+**Trigger:** the diff builds or changes an ordered fallback between a primary and secondary catalog / locale / translation key-set / dialog host, **or** selects host/resolver by installation type, page context, device family, or an empty/stub primary translator.
+
+When triggered: **open the full checklist** `skills/engineer-review/references/ordered-fallback-primary-first-checklist.md` and apply **OF1**. Coverage must note `ordered_fallback: primary-first|reversed|skipped|n/a` when this trigger applies.
+
 ### Empty-collection fail-close (FC1, when triggered)
 
 **Trigger:** the diff short-circuits on an empty or absent upstream collection (`Optional.empty()`, null/absent response, empty list/map) **or** walks nested children of that collection, **and** also adds (or plans to add) a scoped, current-context, or other fallback candidate to the result.
