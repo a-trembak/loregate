@@ -1,6 +1,6 @@
-# JPA Criteria / Specification checklist
+# JPA Criteria / Specification / repository query checklist
 
-Canonical gates for `csp-review-logic` when the diff touches JPA `Specification`, Criteria API subqueries, fetch joins, or collection joins on entities.
+Canonical gates for `csp-review-logic` when the diff touches JPA `Specification`, Criteria API subqueries, fetch joins, collection joins on entities, **or** Spring Data `JpaRepository` / `@Query` methods whose declared return type is a scalar, DTO, or interface projection.
 
 Do **not** hardcode product names or ticket ids. Apply the rule; examples are illustration only.
 
@@ -35,6 +35,21 @@ Do **not** hardcode product names or ticket ids. Apply the rule; examples are il
 4. Note in findings when only mock spec tests exist and no integration test covers the org-scoped query path.
 
 **Anti-pattern:** test stubs `root.get("installation")` while production must use the fetch join handle.
+
+---
+
+## J3 — Repository method return type must match Hibernate selection
+
+**Trigger:** the diff adds or changes a Spring Data repository method that returns a **scalar** (`String`, `UUID`, `Long`, …), a DTO, or an interface projection — including derived `find…` names and `@Query` methods.
+
+**Required check:**
+
+1. The query selection list must match the Java return type. For `List<String>` / `Optional<String>` of an entity id, the JPQL/SQL must select **only** that id attribute (e.g. `select i.uuid …`), not the entity root.
+2. Prefer an **explicit `@Query`** (or equivalent typed projection query) whenever the method does not return the entity type. Do not approve a derived method that can be executed as “select entity” while typed as a scalar — Hibernate fails at **request time** with a result-type / selection mismatch (HTTP 500), not at application startup.
+3. Require proof beyond Mockito stubs of the service that injects the repository: a persistence-provider integration test that calls the repository method, **or** a documented live-path probe (same auth/scope as production) that returns HTTP 200 for the endpoint that uses the method.
+4. When reviewing a composition/refactor that **replaces** an existing working `@Query` / count query with a new repository lookup typed as scalar/projection, re-run checks 1–3 on every new method — green unit tests that stub the repository do not prove Hibernate selection.
+
+**Anti-pattern:** merging `List<String> findUuidBy…(…)` as a derived query (or approving it in review) while only service-layer Mockito tests are green; shipping without a QA/HTTP or Testcontainers call that exercises the real query.
 
 ---
 
