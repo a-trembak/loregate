@@ -27,26 +27,27 @@ if [[ ${#tests[@]} -eq 0 ]]; then
   failed=1
   # Record a failing row so report failed_count matches tests[] (no silent fail).
   printf '%s\t%s\t%s\t%s\n' "(no-tests)" "fail" "1" "0" >>"$tmp_results"
+else
+  # Guard the loop: with `set -u`, empty "${tests[@]}" is an unbound variable on Bash 3.2.
+  for test_script in "${tests[@]}"; do
+    name="$(basename "$test_script")"
+    echo "==> $name"
+    start=$(date +%s)
+    set +e
+    bash "$test_script"
+    code=$?
+    set -e
+    end=$(date +%s)
+    duration=$((end - start))
+    status="pass"
+    if [[ "$code" -ne 0 ]]; then
+      status="fail"
+      failed=$((failed + 1))
+    fi
+    printf '%s\t%s\t%s\t%s\n' "$name" "$status" "$code" "$duration" >>"$tmp_results"
+    echo "    $status exit=$code duration_s=$duration"
+  done
 fi
-
-for test_script in "${tests[@]}"; do
-  name="$(basename "$test_script")"
-  echo "==> $name"
-  start=$(date +%s)
-  set +e
-  bash "$test_script"
-  code=$?
-  set -e
-  end=$(date +%s)
-  duration=$((end - start))
-  status="pass"
-  if [[ "$code" -ne 0 ]]; then
-    status="fail"
-    failed=$((failed + 1))
-  fi
-  printf '%s\t%s\t%s\t%s\n' "$name" "$status" "$code" "$duration" >>"$tmp_results"
-  echo "    $status exit=$code duration_s=$duration"
-done
 
 # Trajectory validate + golden fixture score (always after shell tests)
 traj_start=$(date +%s)

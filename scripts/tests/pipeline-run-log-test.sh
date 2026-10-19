@@ -244,61 +244,35 @@ else
   echo "OK   brief_cap ($line_count lines)"
 fi
 
-# --- flock: serialization smoke when flock present; fail-closed when PATH hides flock ---
-if command -v flock >/dev/null 2>&1; then
-  "$SCRIPT" init --root "$PROJ" --invocation flock1 --route full --reset 2>/dev/null \
-    || "$SCRIPT" init --root "$PROJ" --invocation flock1 --route full
-  (
-    "$SCRIPT" append --root "$PROJ" --invocation flock1 --stage a --note "one" &
-    "$SCRIPT" append --root "$PROJ" --invocation flock1 --stage b --note "two" &
-    wait
-  )
-  flock_body="$(cat "$PROJ/.cursor/gates/run-log/inv-flock1.md")"
-  assert_contains flock_a "$flock_body" "stage=a"
-  assert_contains flock_b "$flock_body" "stage=b"
-fi
+# --- lock: serialization smoke (flock when present; otherwise mkdir lock) ---
+"$SCRIPT" init --root "$PROJ" --invocation flock1 --route full --reset 2>/dev/null \
+  || "$SCRIPT" init --root "$PROJ" --invocation flock1 --route full
+(
+  "$SCRIPT" append --root "$PROJ" --invocation flock1 --stage a --note "one" &
+  "$SCRIPT" append --root "$PROJ" --invocation flock1 --stage b --note "two" &
+  wait
+)
+flock_body="$(cat "$PROJ/.cursor/gates/run-log/inv-flock1.md")"
+assert_contains flock_a "$flock_body" "stage=a"
+assert_contains flock_b "$flock_body" "stage=b"
 
-# Fail-closed writes when flock is not on PATH
-FAKEBIN="$TMP/noflock-bin"
-mkdir -p "$FAKEBIN"
-# Provide only essential commands via real PATH after fakebin — hide flock
-cat >"$FAKEBIN/flock" <<'EOF'
-#!/usr/bin/env bash
-exit 127
-EOF
-chmod +x "$FAKEBIN/flock"
-# Better: empty PATH segment that has no flock — use env PATH without flock
+# Writes still work when flock is absent from PATH (mkdir-lock fallback for macOS).
 NOFLOCK_PATH="$TMP/path-noflock"
 mkdir -p "$NOFLOCK_PATH"
-# Link common tools needed by the script
-for cmd in bash mkdir mv cat chmod head tail grep awk sed tr printf python3 date flock; do
-  true
-done
-# Build a PATH that has bash/python/coreutils but not flock
-CORE="$(dirname "$(command -v bash)")"
-PY="$(dirname "$(command -v python3)")"
-# Use env -i with curated PATH that excludes flock by putting a stub first that always fails discoverability
-# Spec: if flock missing, fail writes. Remove flock from PATH entirely.
-PATH_NO_FLOCK=""
-for d in /usr/bin /bin /usr/local/bin; do
-  [[ -d "$d" ]] || continue
-  PATH_NO_FLOCK="${PATH_NO_FLOCK:+$PATH_NO_FLOCK:}$d"
-done
-# Confirm flock not found under filtered view by wrapping: command -v flock fails if we shadow
-# Use a subshell with PATH that has a fake `command`? Simpler approach:
-# Copy script deps into NOFLOCK_PATH without flock
-for bin in bash sh mkdir mv rm cat chmod head tail grep awk sed tr printf python3 date mktemp dirname basename pwd cd true false; do
+for bin in bash sh mkdir mv rm rmdir cat chmod head tail grep awk sed tr printf python3 date mktemp dirname basename pwd cd true false sleep touch; do
   src="$(command -v "$bin" 2>/dev/null || true)"
   if [[ -n "$src" && -x "$src" ]]; then
     ln -sf "$src" "$NOFLOCK_PATH/$bin" 2>/dev/null || cp "$src" "$NOFLOCK_PATH/$bin" 2>/dev/null || true
   fi
 done
-# Do NOT link flock
-"$SCRIPT" init --root "$PROJ" --invocation noflock --route full 2>/dev/null || true
+# Do NOT link flock — fallback must cover this host path.
+"$SCRIPT" init --root "$PROJ" --invocation noflock --route full --reset 2>/dev/null \
+  || env PATH="$NOFLOCK_PATH" "$SCRIPT" init --root "$PROJ" --invocation noflock --route full --reset \
+  || env PATH="$NOFLOCK_PATH" "$SCRIPT" init --root "$PROJ" --invocation noflock --route full
 rc=0
 env PATH="$NOFLOCK_PATH" "$SCRIPT" append --root "$PROJ" --invocation noflock --stage x --note "y" || rc=$?
-assert_nonzero flock_missing_write_fails "$rc"
-# read-tail / path still ok without flock
+assert_eq flock_missing_write_ok "0" "$rc"
+assert_contains flock_missing_note "$(cat "$PROJ/.cursor/gates/run-log/inv-noflock.md")" "stage=x"
 rc=0
 env PATH="$NOFLOCK_PATH" "$SCRIPT" path --root "$PROJ" --invocation noflock >/dev/null || rc=$?
 assert_eq flock_missing_path_ok "0" "$rc"

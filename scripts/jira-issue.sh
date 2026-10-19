@@ -6,7 +6,8 @@ jira_extract_key() {
   local input="$1" key=""
   if [[ "$input" =~ ([A-Za-z][A-Za-z0-9]+-[0-9]+) ]]; then
     key="${BASH_REMATCH[1]}"
-    printf '%s' "${key^^}"
+    # Bash 3.2 (macOS) has no ${var^^}; use tr.
+    printf '%s' "$key" | tr '[:lower:]' '[:upper:]'
     return 0
   fi
   return 1

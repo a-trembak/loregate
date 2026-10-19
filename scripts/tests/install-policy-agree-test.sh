@@ -40,7 +40,7 @@ assert_grep help_i_agree "scripts/install-to-project.sh" "i-agree"
 assert_grep help_env "scripts/install-to-project.sh" "LGT_AGREE_POLICY|CSP_AGREE_POLICY"
 assert_grep cli_help "bin/lgt" "agree-policy"
 assert_grep hasher "scripts/csp-policy-hash.sh" "PRIVACY.md"
-assert_grep name_opts "docs/legal/NAME-OPTIONS.md" "gh repo rename"
+assert_grep name_opts "docs/legal/NAME-OPTIONS.md" "a-trembak/loregate"
 assert_grep readme_agree "README.md" "agree-policy"
 
 HASH="$("$ROOT/scripts/csp-policy-hash.sh" --kit-root "$ROOT")"

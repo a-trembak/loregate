@@ -50,13 +50,14 @@ pg__extract_ticket() {
 
   if [[ "$basename" =~ ([A-Za-z][A-Za-z0-9]*-[0-9]+) ]]; then
     ticket="${BASH_REMATCH[1]}"
-    printf '%s' "${ticket^^}"
+    # Bash 3.2 (macOS) has no ${var^^}; use tr.
+    printf '%s' "$ticket" | tr '[:lower:]' '[:upper:]'
     return 0
   fi
 
   if [[ "$norm" =~ ([A-Za-z][A-Za-z0-9]*-[0-9]+) ]]; then
     ticket="${BASH_REMATCH[1]}"
-    printf '%s' "${ticket^^}"
+    printf '%s' "$ticket" | tr '[:lower:]' '[:upper:]'
     return 0
   fi
 

@@ -24,12 +24,53 @@ prl__validate_invocation() {
   return 0
 }
 
-prl__require_flock() {
-  if ! command -v flock >/dev/null 2>&1; then
-    echo "pipeline-run-log: flock required for writes; not found on PATH" >&2
-    return 1
+# Exclusive lock for journal writes. Prefer util-linux `flock` when present;
+# otherwise use a portable mkdir lock (macOS ships neither flock nor util-linux).
+prl__with_lock() {
+  local lockfile="$1"
+  shift
+  mkdir -p "$(dirname "$lockfile")"
+
+  if command -v flock >/dev/null 2>&1; then
+    touch "$lockfile"
+    # shellcheck disable=SC2034
+    exec 200>"$lockfile"
+    if ! flock -x 200; then
+      echo "pipeline-run-log: flock failed" >&2
+      exec 200>&-
+      return 1
+    fi
+    local rc=0
+    "$@" || rc=$?
+    flock -u 200 2>/dev/null || true
+    exec 200>&-
+    return "$rc"
   fi
-  return 0
+
+  local lockdir="${lockfile}.d"
+  local lock_parent attempts=0
+  lock_parent="$(dirname "$lockfile")"
+  while ! mkdir "$lockdir" 2>/dev/null; do
+    # Contention: lockdir exists. Permission / other errors: fail fast (do not sleep 200s).
+    if [[ ! -d "$lockdir" ]]; then
+      echo "pipeline-run-log: cannot create lock ($lockdir)" >&2
+      return 1
+    fi
+    if [[ ! -w "$lock_parent" ]]; then
+      echo "pipeline-run-log: lock parent not writable ($lock_parent)" >&2
+      return 1
+    fi
+    attempts=$((attempts + 1))
+    if [[ "$attempts" -gt 200 ]]; then
+      echo "pipeline-run-log: lock timeout ($lockdir)" >&2
+      return 1
+    fi
+    sleep 1
+  done
+  local rc=0
+  "$@" || rc=$?
+  rmdir "$lockdir" 2>/dev/null || true
+  return "$rc"
 }
 
 prl__normalize_note() {
@@ -87,15 +128,19 @@ prl__write_pointer() {
   } >"$ptr"
 }
 
-# Read pointer key=value fields into nameref vars (empty if missing/invalid).
+# Read pointer key=value fields into caller variables (names as $2..$5).
+# Avoids Bash 4 `local -n` so macOS Bash 3.2 works.
 prl__read_pointer() {
   local root="$1"
-  local -n _out_id="$2" _out_plan="$3" _out_slug="$4" _out_journal="$5"
-  local ptr line key val
-  _out_id=""
-  _out_plan=""
-  _out_slug=""
-  _out_journal=""
+  local __id_var="$2" __plan_var="$3" __slug_var="$4" __journal_var="$5"
+  local ptr line key val _id="" _plan="" _slug="" _journal="" v
+  for v in "$__id_var" "$__plan_var" "$__slug_var" "$__journal_var"; do
+    [[ "$v" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || return 2
+  done
+  eval "$__id_var=\"\""
+  eval "$__plan_var=\"\""
+  eval "$__slug_var=\"\""
+  eval "$__journal_var=\"\""
   ptr="$(prl__pointer_path "$root")"
   [[ -f "$ptr" ]] || return 1
   while IFS= read -r line || [[ -n "$line" ]]; do
@@ -105,17 +150,18 @@ prl__read_pointer() {
     val="${val#"${val%%[![:space:]]*}"}"
     val="${val%"${val##*[![:space:]]}"}"
     case "$key" in
-      invocation) _out_id="$val" ;;
-      plan) _out_plan="$val" ;;
-      slug) _out_slug="$val" ;;
-      journal) _out_journal="$val" ;;
+      invocation) _id="$val" ;;
+      plan) _plan="$val" ;;
+      slug) _slug="$val" ;;
+      journal) _journal="$val" ;;
     esac
   done <"$ptr"
-  [[ -n "$_out_id" ]] || return 1
-  prl__validate_invocation "$_out_id" >/dev/null 2>&1 || {
-    _out_id=""
-    return 1
-  }
+  [[ -n "$_id" ]] || return 1
+  prl__validate_invocation "$_id" >/dev/null 2>&1 || return 1
+  eval "$__id_var=\"\$_id\""
+  eval "$__plan_var=\"\$_plan\""
+  eval "$__slug_var=\"\$_slug\""
+  eval "$__journal_var=\"\$_journal\""
   return 0
 }
 
@@ -236,27 +282,6 @@ if m:
 ' "$path"
 }
 
-prl__with_lock() {
-  # prl__with_lock <lockfile> — caller supplies commands on stdin via eval of remaining args
-  local lockfile="$1"
-  shift
-  prl__require_flock || return 1
-  mkdir -p "$(dirname "$lockfile")"
-  touch "$lockfile"
-  # shellcheck disable=SC2034
-  exec 200>"$lockfile"
-  if ! flock -x 200; then
-    echo "pipeline-run-log: flock failed" >&2
-    exec 200>&-
-    return 1
-  fi
-  local rc=0
-  "$@" || rc=$?
-  flock -u 200 2>/dev/null || true
-  exec 200>&-
-  return "$rc"
-}
-
 prl_cmd_init() {
   local root="" id="" route="unknown" reset=0
   while [[ $# -gt 0 ]]; do
@@ -277,7 +302,6 @@ prl_cmd_init() {
   }
   prl__validate_invocation "$id" || return $?
   root="$(cd "$root" && pwd)"
-  prl__require_flock || return 1
 
   local inv dir
   dir="$(prl__run_log_dir "$root")"
@@ -294,7 +318,7 @@ prl_cmd_init() {
   return 0
 }
 
-# Duplicate stage+note check and write share one flock critical section.
+# Duplicate stage+note check and write share one lock critical section.
 prl__append_locked() {
   local journal="$1" stage="$2" normalized="$3"
   local last stamp last_stage last_note
@@ -332,7 +356,6 @@ prl_cmd_append() {
   }
   prl__validate_invocation "$id" || return $?
   root="$(cd "$root" && pwd)"
-  prl__require_flock || return 1
 
   local journal normalized
   journal="$(prl__resolve_journal "$root" "$id" "$plan")"
@@ -404,7 +427,6 @@ prl_cmd_promote() {
   }
   prl__validate_invocation "$id" || return $?
   root="$(cd "$root" && pwd)"
-  prl__require_flock || return 1
 
   local source target slug existing_route existing_started norm_plan
   source="$(prl__inv_path "$root" "$id")"
@@ -542,7 +564,6 @@ prl_cmd_brief_upsert() {
   }
   prl__validate_invocation "$id" || return $?
   root="$(cd "$root" && pwd)"
-  prl__require_flock || return 1
 
   local brief
   brief="$(prl__brief_path "$root" "$id")"

@@ -68,7 +68,7 @@ assert_eq review_layer "review" "$(json_field "$rev_json" 'd["layer"]')"
 assert_eq review_stage "review-gate" "$(json_field "$rev_json" 'd["stage"]')"
 assert_eq review_pending_kind "review-gate" "$(json_field "$rev_json" 'd["pending_gates"][0]["kind"]')"
 assert_eq review_pending_slug "DEMO" "$(json_field "$rev_json" 'd["pending_gates"][0]["slug"]')"
-assert_eq review_legal_to "Build/lgt-software-developer" "$(json_field "$rev_json" 'next((x["to"] for x in d["legal_returns"] if "fixes" in x.get("how","") or x["to"].startswith("Build")), "")')"
+assert_eq review_legal_to "Build/csp-software-developer" "$(json_field "$rev_json" 'next((x["to"] for x in d["legal_returns"] if "fixes" in x.get("how","") or x["to"].startswith("Build")), "")')"
 # legal_returns for review-gate includes Build / fixes
 legal_how="$(json_field "$rev_json" '" ".join(x.get("how","") for x in d["legal_returns"])')"
 assert_contains review_legal_fixes "$legal_how" "fixes"
