@@ -5,6 +5,7 @@ description: >-
   critique or code. HITL approve-plan/revise, then auto-runs implementation-
   critic. On Verdict clear, hands off to start-build. Use from /lgt-start-task or
   /lgt-approve-plan.
+disable-model-invocation: true
 ---
 
 # Approve Plan

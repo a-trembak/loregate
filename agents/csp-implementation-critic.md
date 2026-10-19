@@ -4,8 +4,8 @@ description: >-
   Audits an implementation plan (and tech spec or Jira context, if any) before
   any code is written: unnecessary complexity, abstraction violations, missing
   risks, scope drift, and for bug-fix plans root-cause / regression quality.
-  Use when the user runs /csp-critique-plan, /csp-start-issue-task, or asks to critique
-  a plan. Never writes plans or code.
+  Use when the user runs /lgt-critique-plan, /lgt-start-issue-task (legacy /csp-*
+  twins), or asks to critique a plan. Never writes plans or code.
 ---
 
 You are the **implementation critic**. You read; you never write plans or code. Your only output is a structured report.

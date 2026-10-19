@@ -5,6 +5,7 @@ description: >-
   (or an equivalent critique) and code should start. Creates no critique —
   dispatches csp-software-developer, waits for it to return, then finish-plan
   (engineer-reviewer). Fire-and-forget dispatch is a hard failure.
+disable-model-invocation: true
 ---
 
 # Start Build

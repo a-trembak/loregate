@@ -30,6 +30,7 @@ assert_file "skills/start-build/SKILL.md"
 assert_file "commands/lgt-start-build.md"
 assert_file "skills/software-developer/SKILL.md"
 assert_file "agents/csp-software-developer.md"
+assert_file "agents/csp-verifier.md"
 assert_file "commands/lgt-start-task.md"
 assert_file "commands/lgt-start-issue-task.md"
 assert_file "agents/csp-bug-fixer.md"
@@ -47,9 +48,19 @@ assert_grep start_build_cmd_reviewer "commands/lgt-start-build.md" "csp-engineer
 assert_grep dev_skill_next "skills/software-developer/SKILL.md" "next_skill"
 assert_grep dev_skill_nested "skills/software-developer/SKILL.md" "nested Task"
 assert_grep dev_skill_no_ask "skills/software-developer/SKILL.md" "AskQuestion"
+assert_grep dev_skill_verifier "skills/software-developer/SKILL.md" "csp-verifier"
+assert_grep dev_skill_verdict "skills/software-developer/SKILL.md" "verifier_verdict"
 assert_grep dev_agent_next "agents/csp-software-developer.md" "next_skill"
 assert_grep dev_agent_nested "agents/csp-software-developer.md" "nested Task"
 assert_grep dev_agent_no_ask "agents/csp-software-developer.md" "AskQuestion"
+assert_grep dev_agent_verifier "agents/csp-software-developer.md" "csp-verifier"
+
+# Readonly independent verifier before handoff.
+assert_grep verifier_readonly "agents/csp-verifier.md" "readonly: true"
+assert_grep verifier_no_edit "agents/csp-verifier.md" "Never edits files|Do not edit files|readonly"
+assert_grep verifier_verdicts "agents/csp-verifier.md" "verified"
+assert_grep bug_skill_verifier "skills/bug-fix/SKILL.md" "csp-verifier"
+assert_grep bug_agent_verifier "agents/csp-bug-fixer.md" "csp-verifier"
 
 # /lgt-start-task full: wait then finish-plan; fast: wait then engineer-reviewer.
 assert_grep start_task_wait "commands/lgt-start-task.md" "Wait for"

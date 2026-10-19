@@ -3,6 +3,7 @@ name: finish-plan
 description: >-
   Use when an implementation plan has just been fully executed or you are about
   to declare plan work complete — before engineer-review or any post-plan wrap-up.
+disable-model-invocation: true
 ---
 
 # Finish Plan

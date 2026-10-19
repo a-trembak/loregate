@@ -4,8 +4,13 @@ description: >-
   Use when an approved tech spec and a critiqued-clear implementation plan are
   ready to turn into code, or from /lgt-start-task --fast (mode:fast) with a short
   AC brief. Creates feature branch(es), routes stack/DB skills from skill-map,
-  applies code-comments, and verifies before handoff. On react-web UI work,
-  compares the rendered result to Figma via ce-test-browser when URLs exist.
+  applies code-comments, verifies, then dispatches readonly csp-verifier before
+  handoff. On react-web UI work, compares the rendered result to Figma via
+  ce-test-browser when URLs exist. Invoke explicitly — do not auto-start coding
+  from ambient chat.
+disable-model-invocation: true
+icon: code
+color: green
 ---
 
 # Software Developer
@@ -109,6 +114,18 @@ When in doubt, omit the comment. Align with repo precedent (e.g. `d25dedc` — c
 
 Default: dispatch `subagent-driven-development` (fresh implementer + task reviewer per task) with the skill set for this run loaded into context, **after** branch setup succeeds. If the user already asked for a separate session, honor `executing-plans` instead. In `mode:fast`, a single-pass implement + verify is acceptable when the change is tiny; still run verification before handoff.
 
+## Independent verifier (mandatory before handoff)
+
+After your own lint/test/typecheck evidence exists and **before** the handoff block:
+
+1. Dispatch nested Task **`csp-verifier`** (readonly) with the claim, `repo → branch` map, and the checks you already ran.
+2. **Wait for** the verifier report.
+3. On Verdict **`blocked`**: fix the gaps (or stop and report blockers). Re-run `csp-verifier` until the verdict is not `blocked`. Do **not** emit handoff while blocked.
+4. On **`implemented but unverified`**: include the gaps in the handoff; do not upgrade the claim to “done” without evidence. Prefer re-running checks when the blocker is environmental and fixable in-session.
+5. On **`verified`**: proceed to handoff and copy the verdict into the block below.
+
+Tiny `mode:fast` changes still dispatch `csp-verifier`; keep the check set proportional. Never skip the agent to save a turn.
+
 ## Handoff
 
 Emit this block to the caller (required), then follow the nested-vs-parent rule:
@@ -121,6 +138,7 @@ plan_path: <path or none>
 repo_branch_map:
   - <repo> → <branch>
 verification: <lint/test/typecheck evidence>
+verifier_verdict: verified | implemented but unverified
 graphify: used|absent|unqueryable
 graphify_refresh: ok|skipped|failed
 ```

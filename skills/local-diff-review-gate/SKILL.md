@@ -5,6 +5,8 @@ description: >-
   dirty working-tree / staged changes, apply human comments, never commit or
   open a pull request. Use from engineer-review step 15 after teach-review
   miss; also before residual propose-commit when the tree is dirty again.
+disable-model-invocation: true
+
 ---
 
 # Local Diff Review Gate

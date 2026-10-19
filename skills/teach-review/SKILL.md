@@ -5,6 +5,7 @@ description: >-
   instructions (checklist, skill, or agent), commit on learn/…, and land on
   the cursor-spells remote. Use after Teach-review miss (miss), Capture-escape
   destination (miss), or /lgt-teach-review.
+disable-model-invocation: true
 ---
 
 # Teach-review

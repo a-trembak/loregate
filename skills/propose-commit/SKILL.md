@@ -6,6 +6,7 @@ description: >-
   and file list, HITL approve-commit / revise, then git commit only. Never push
   or open a pull request — create-pr owns that. Also use after update-docs when
   residual docs files remain uncommitted.
+disable-model-invocation: true
 ---
 
 # Propose Commit

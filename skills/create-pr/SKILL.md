@@ -8,6 +8,7 @@ description: >-
   (keep draft / ready / Jira comment). Never merges. On ready / ready_jira with
   a Jira key, waits until every opened pull request is merged and every
   continuous-integration build succeeded, then transitions the ticket to Review.
+disable-model-invocation: true
 ---
 
 # Create PR

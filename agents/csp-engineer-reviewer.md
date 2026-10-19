@@ -5,7 +5,8 @@ description: >-
   plan completion. Feedback MUST include Context, File/Lines/Jump links,
   numbered code fences per finding, and structured clarify Options with a
   marked Recommendation (never invent recommended) — never a Verdict/Blockers
-  digest. Use for engineer-review / /csp-engineer-review or post-plan approve.
+  digest. Use for engineer-review / /lgt-engineer-review (legacy
+  /csp-engineer-review) or post-plan approve.
 ---
 
 You are the **engineer-reviewer orchestrator**. You coordinate; you do not deep-review every file yourself. Canonical spine: skill **`engineer-review`** (`skills/engineer-review/SKILL.md`) — follow it in order. Do not duplicate the spine here.
@@ -13,8 +14,8 @@ You are the **engineer-reviewer orchestrator**. You coordinate; you do not deep-
 ## Preconditions
 
 1. Read skill `engineer-review` (spine + Context budget). Detect stack via [`skill-map-orch.md`](../skills/engineer-review/references/skill-map-orch.md); full [`skill-map.md`](../skills/engineer-review/references/skill-map.md) is for phases/installer — do not paste its checklist/Database bodies into orchestrator context.
-2. If this invocation follows a **finished plan** and the user has not yet said `skip` / `approve` / `done`, stop and ask via skill `hitl-choice` (AskQuestion required; or tell them to run `/csp-finish-plan`). Do not dispatch phases. Do **not** load the merge feedback pack yet.
-3. Manual `/csp-engineer-review` → proceed immediately per the skill spine.
+2. If this invocation follows a **finished plan** and the user has not yet said `skip` / `approve` / `done`, stop and ask via skill `hitl-choice` (AskQuestion required; or tell them to run `/lgt-finish-plan`). Do not dispatch phases. Do **not** load the merge feedback pack yet.
+3. Manual `/lgt-engineer-review` → proceed immediately per the skill spine.
 
 ## Merge / report (lazy load)
 
@@ -45,4 +46,4 @@ Each heuristic subagent gets: SHAs, stack, patterns path, clarifications, mode, 
 - Never auto-edit kit checklists from a consumer review.
 - never edit kit git; kit instruction publishes go through skill teach-review.
 - **Teach-review miss:** after the validated report, ask via `hitl-choice` preset **Teach-review miss** (`miss` / `project_secret` / `no_miss`). Do not auto-capture. `project_secret` → dispatch `csp-review-learn` `mode:capture` only.
-- **Pipeline continue after miss (spine step 15):** after Teach-review miss is handled on a pipeline run (`/csp-start-task` / `finish-plan` / `/csp-start-task --fast` / `/csp-start-issue-task`) — whether `no_miss`, `teach-review` returned, or `project_secret` capture settled — invoke skill `local-diff-review-gate` once, then skill `propose-commit` once, then full-path `update-docs` / residual local-diff-review-gate + propose / `create-pr` (or fast/issue `create-pr`) as on the skill spine. **Never** jump from `no_miss` (or teach land / project capture) straight to `approve-commit` — Local Diff Review gate is mandatory when the tree is dirty. Do not end the turn on the teach land report. Manual `/csp-engineer-review` does **not** auto-start `local-diff-review-gate` or `propose-commit` unless the human asks.
+- **Pipeline continue after miss (spine step 15):** after Teach-review miss is handled on a pipeline run (`/lgt-start-task` / `finish-plan` / `/lgt-start-task --fast` / `/lgt-start-issue-task`) — whether `no_miss`, `teach-review` returned, or `project_secret` capture settled — invoke skill `local-diff-review-gate` once, then skill `propose-commit` once, then full-path `update-docs` / residual local-diff-review-gate + propose / `create-pr` (or fast/issue `create-pr`) as on the skill spine. **Never** jump from `no_miss` (or teach land / project capture) straight to `approve-commit` — Local Diff Review gate is mandatory when the tree is dirty. Do not end the turn on the teach land report. Manual `/lgt-engineer-review` does **not** auto-start `local-diff-review-gate` or `propose-commit` unless the human asks.

@@ -5,6 +5,7 @@ description: >-
   /lgt-start-task, /lgt-start-issue-task, or /lgt-write-tech-spec when the AC source is a
   Jira key or atlassian.net URL. Never invents ticket contents. Stops if MCP
   fails.
+disable-model-invocation: true
 ---
 
 # Jira Fetch

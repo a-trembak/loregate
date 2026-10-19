@@ -6,6 +6,7 @@ description: >-
   create-pr (review after every opened pull request is merged and
   continuous integration succeeded). Never merges GitHub PRs.
   Never invents transition ids.
+disable-model-invocation: true
 ---
 
 # Jira Transition

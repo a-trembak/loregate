@@ -38,7 +38,7 @@ When the diff renames or prefixes kit slash commands / agents, or edits `docs/su
 
 - Prefixed agent ids must appear in Mermaid and pipeline-canvas labels (**P1**).
 - Skill folders and skill `name:` fields stay unprefixed (**P2**).
-- Never write ``Skill `/…`` `` — distinguish skill `finish-plan` from slash command `/csp-finish-plan` (or the kit's current command spelling) (**P3**).
+- Never write ``Skill `/…`` `` — distinguish skill `finish-plan` from slash command `/lgt-finish-plan` (legacy `/csp-finish-plan`) (**P3**).
 - Harness / health checks that open `skills/<name>/SKILL.md` keep unprefixed skill directory names (**P4**).
 
 ## Traceability check (when a tech spec exists)

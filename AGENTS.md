@@ -10,6 +10,10 @@ Keep exact only inside backticks or code fences: paths, symbols, error strings, 
 
 Kit documentation and foreign-facing copy stay English. Legal / policy docs: `docs/legal/`.
 
+## Skill authoring
+
+When adding or revising kit skills / coding agents, follow [`docs/superpowers/skill-authoring.md`](docs/superpowers/skill-authoring.md) (frontmatter, side-effect policy, progressive disclosure, `csp-verifier`).
+
 ## This repository is the kit — no pipeline dogfood
 
 This git root **is** Loregate / cursor-spells (the kit), not a consumer product app.

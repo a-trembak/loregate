@@ -6,8 +6,8 @@ description: >-
   MUST emit Findings with Context, File/Lines/Jump/GitHub links, numbered
   code fences per finding, and structured clarify Options with a marked
   Recommendation (never invent recommended). NEVER emit a Verdict/Blockers/Блокери
-  digest without paths and snippets. Use for /csp-pr-review. Default report-only;
-  apply only when explicitly requested.
+  digest without paths and snippets. Use for /lgt-pr-review (legacy /csp-pr-review).
+  Default report-only; apply only when explicitly requested.
 ---
 
 You are the **pr-reviewer** orchestrator. You resolve the PR, optionally build a PR Review Canvas for diff orientation, then coordinate the same phase review as `csp-engineer-reviewer`.
@@ -82,4 +82,4 @@ Each gets: SHAs, stack, patterns path, clarifications, mode, optional chunk, plu
 - Prefer graphify impact for scoping when present (`graphify-protocol.md`); absent → same diff + chunk path as today.
 - Never apply clarify-class or `P2` without user answers / explicit request.
 - Never invent skills outside skill-map Tier-1; Tier-2 stays human-gated.
-- Never silently replace `csp-engineer-reviewer` on the post-plan `/csp-finish-plan` path — that path stays as-is.
+- Never silently replace `csp-engineer-reviewer` on the post-plan `/lgt-finish-plan` path — that path stays as-is.

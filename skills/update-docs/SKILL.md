@@ -6,6 +6,7 @@ description: >-
   repo, a separate docs repository, or Confluence — then write dual-audience
   product docs (user + engineer). Prefer this over dumping the tech spec into
   README or inventing a docs destination.
+disable-model-invocation: true
 ---
 
 # Update Docs

@@ -8,6 +8,9 @@ description: >-
   code snippets, clickable file:line links, english-humanizer prose, and
   structured clarify Options with a marked Recommendation (never invent
   recommended).
+disable-model-invocation: true
+icon: shield
+color: blue
 ---
 
 # Engineer Review
