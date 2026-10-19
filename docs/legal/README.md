@@ -4,7 +4,7 @@
 
 Formal English policy documents for this pipeline kit authored by **Andrey Trembak** (`a-trembak`).
 
-**Product name:** **Loregate** (short mark **LGT**). Tagline: *From lore to merge through gates.* The git remote may still be `cursor-spells` until a human renames it. Details: [NAME-OPTIONS.md](NAME-OPTIONS.md). Do not use third-party marks such as “Cursor” in the product title.
+**Product name:** **Loregate** (short mark **LGT**). Tagline: *From lore to merge through gates.* GitHub: [`a-trembak/loregate`](https://github.com/a-trembak/loregate) (formerly `cursor-spells`). Details: [NAME-OPTIONS.md](NAME-OPTIONS.md). Do not use third-party marks such as “Cursor” in the product title.
 
 | Document | Purpose |
 |----------|---------|

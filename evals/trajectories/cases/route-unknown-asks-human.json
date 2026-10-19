@@ -1,12 +1,12 @@
 {
   "id": "route-unknown-asks-human",
-  "title": "Unknown Jira type on /csp-start-task must ask Pipeline route and must never invent --fast",
+  "title": "Unknown Jira type on /lgt-start-task must ask Pipeline route and must never invent --fast",
   "source": "docs/superpowers/dogfood/jira-ac-router-finale-checklist.md",
   "pipeline": "slice",
   "end_to_end": false,
   "status": "active",
   "input": {
-    "invocation": "/csp-start-task PROJ-1",
+    "invocation": "/lgt-start-task PROJ-1",
     "fetch": "ok",
     "jira_class": "unknown"
   },

@@ -2,9 +2,9 @@
 
 **Effective date:** 29 September 2026  
 **Author / operator of this kit:** Andrey Trembak (`a-trembak`)  
-**Product:** **Loregate** (short mark **LGT**). GitHub repository id may still be [cursor-spells](https://github.com/a-trembak/cursor-spells) until renamed.
+**Product:** **Loregate** (short mark **LGT**). GitHub repository: [a-trembak/loregate](https://github.com/a-trembak/loregate) (formerly `cursor-spells`).
 
-This Privacy Policy describes how personal and project data may be handled when you install or use the **Loregate** pipeline kit (repository may still be named cursor-spells) (skills, slash commands, rules, hooks, agents, and related scripts). It is written for honesty about a **local developer toolkit**, not a hosted consumer product.
+This Privacy Policy describes how personal and project data may be handled when you install or use the **Loregate** pipeline kit (skills, slash commands, rules, hooks, agents, and related scripts). It is written for honesty about a **local developer toolkit**, not a hosted consumer product.
 
 This document is **not** a substitute for the privacy policies of Cursor, GitHub, Jira, Slack, Model Context Protocol tool providers, model hosts, or any other third party you connect.
 
@@ -19,7 +19,7 @@ This document is **not** a substitute for the privacy policies of Cursor, GitHub
 | Your project repositories | **You** and your Git / GitHub / forge hosts |
 | Model Context Protocol servers you enable | **Those third-party operators** (and their policies) |
 | Ticketing, chat, calendar, or similar integrations | **Those third-party operators** |
-| The public `cursor-spells` GitHub repository | Public content you push or issues you open are under GitHub’s and this repository’s terms |
+| The public `loregate` GitHub repository (formerly `cursor-spells`) | Public content you push or issues you open are under GitHub’s and this repository’s terms |
 
 **The kit author does not operate a central Loregate cloud that receives your agent chats or project files by default.** Installing the kit copies or links files onto machines you control. The author cannot see your local chats, local project contents, or your Model Context Protocol credentials unless you separately send them (for example by opening a GitHub issue that pastes logs).
 
@@ -121,7 +121,7 @@ The author may update this policy by committing a new version to the repository.
 
 ## 11. Contact
 
-Privacy questions about **this kit’s documentation** (not about Cursor or other vendors): open a GitHub issue on [a-trembak/cursor-spells](https://github.com/a-trembak/cursor-spells) or contact the repository owner `a-trembak`.
+Privacy questions about **this kit’s documentation** (not about Cursor or other vendors): open a GitHub issue on [a-trembak/loregate](https://github.com/a-trembak/loregate) or contact the repository owner `a-trembak`.
 
 For Cursor, GitHub, or Model Context Protocol vendor questions, contact those organizations directly.
 

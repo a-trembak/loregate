@@ -1,7 +1,7 @@
 {
   "case_id": "route-feature-to-full",
   "input": {
-    "invocation": "/csp-start-task PROJ-1",
+    "invocation": "/lgt-start-task PROJ-1",
     "fetch": "ok",
     "jira_class": "feature"
   },

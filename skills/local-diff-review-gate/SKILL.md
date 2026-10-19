@@ -6,7 +6,6 @@ description: >-
   open a pull request. Use from engineer-review step 15 after teach-review
   miss; also before residual propose-commit when the tree is dirty again.
 disable-model-invocation: true
-
 ---
 
 # Local Diff Review Gate
@@ -24,7 +23,7 @@ Thin kit gate around the **Local Diff Review** Cursor plugin. Canvas protocol st
 ## Preconditions
 
 - Plugin skill file resolvable as `review-local-diff` (typical install: `~/.cursor/plugins/local/local-diff-review/skills/review-local-diff/SKILL.md`). Payload contract: plugin `skills/review-local-diff/references/payload.md`.
-- Canvas file the plugin writes: `~/.cursor/projects/<workspace>/canvases/local-diff-review.canvas.tsx` with sidecar `local-diff-review.canvas.data.json` (`outbound` key).
+- Canvas built by plugin script `~/.cursor/plugins/local/local-diff-review/bin/build-canvas.mjs` → `~/.cursor/projects/<workspace>/canvases/local-diff-review.canvas.tsx` with sidecar `local-diff-review.canvas.data.json` (`outbound` key).
 
 ## Steps (per dirty repo)
 
@@ -48,12 +47,12 @@ For **each** repo in map order:
 5. On **`approve-diff`:** run-log note `approve-diff`; next repo (or continue to `propose-commit`).
 
 6. On **`comment`:**
-   1. Record `reviewStartedAt` (ISO time now).
-   2. In **this same thread**, read and follow plugin skill `review-local-diff` (write/update `local-diff-review.canvas.tsx`). Tell the human to leave **Current thread** selected and press **Send**. Do **not** open a new chat unless they pick New chat.
-   3. Wait until canvas sidecar `outbound` has `kind: local-diff-review/comments`, `version: 1`, and `sentAt` **newer** than `reviewStartedAt` — or the human pastes the same JSON into this chat.
-   4. Apply **only** those comments (edit the working tree). Do **not** `git commit`. Do **not** push. Do **not** open or update a pull request.
+   1. Follow plugin skill `review-local-diff`: run `bin/build-canvas.mjs` (do not hand-write the canvas or parse `git diff`). Link the canvas.
+   2. Tell the human: **Prepare for this chat** → **copy the paste block** → **paste into this thread** (keeps pipeline context). Optional **Open new chat** only if losing history is OK. Agents do not auto-read the sidecar; Canvas cannot inject into this thread.
+   3. **Do not poll** `*.canvas.data.json`. End the turn; wait for the human’s next reply here.
+   4. When they paste `local-diff-review/comments` (or say apply local-diff comments), apply those comments here, then `build-canvas.mjs --refresh --fresh-ui`. Do **not** commit, push, or open a PR.
    5. Ask the same two tokens **once more** (`approve-diff` / `comment`).
-   6. If the second answer is `comment` again: open/refresh canvas, wait for a newer `sentAt`, apply once more, then **continue** (do not loop further). Run-log note `comment`.
+   6. If the second answer is `comment` again: rebuild canvas via script, same paste-into-this-thread flow once more, then **continue** (do not loop further). Run-log note `comment`.
    7. If the second answer is `approve-diff`: run-log note `approve-diff`; continue.
 
 7. After all repos: return to the caller so it can invoke `propose-commit`.

@@ -1,7 +1,7 @@
 {
   "case_id": "fetch-failure-stops",
   "input": {
-    "invocation": "/csp-start-task PROJ-1",
+    "invocation": "/lgt-start-task PROJ-1",
     "fetch": "fail"
   },
   "stages_entered": ["jira-fetch"],

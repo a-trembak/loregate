@@ -1,7 +1,7 @@
 {
   "case_id": "start-issue-story-stays-issue",
   "input": {
-    "invocation": "/csp-start-issue-task PROJ-1",
+    "invocation": "/lgt-start-issue-task PROJ-1",
     "fetch": "ok",
     "jira_class": "feature"
   },

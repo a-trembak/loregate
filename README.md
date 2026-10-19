@@ -6,7 +6,7 @@
 
 Personal workflow kit — skills, slash commands, rules, hooks, and agents. Author: Andrey Trembak (`a-trembak`). Brand lock and GitHub rename note: [`docs/legal/NAME-OPTIONS.md`](docs/legal/NAME-OPTIONS.md). Do not put “Cursor” in the product title.
 
-> GitHub repository id may still be `cursor-spells` until a human runs `gh repo rename loregate --repo a-trembak/cursor-spells`. In-repo CLI and commands are already `lgt` / `/lgt-*`.
+> GitHub repository: [`a-trembak/loregate`](https://github.com/a-trembak/loregate) (formerly `cursor-spells`). In-repo CLI and commands are `lgt` / `/lgt-*` (deprecated `/csp-*` stubs still forward).
 
 ## Developing this kit (no pipeline dogfood)
 
@@ -14,16 +14,16 @@ When the workspace **is** this repository, do **not** run `/lgt-start-task` (or 
 
 ## Install & update
 
-**Do not clone this repo into every app.** Keep **one** checkout of `cursor-spells`, then point each project at it.
+**Do not clone this repo into every app.** Keep **one** checkout of Loregate, then point each project at it.
 
 ### First-time install
 
 ```bash
 # 1) Clone the kit once
-git clone https://github.com/a-trembak/cursor-spells.git ~/cursor-spells
+git clone https://github.com/a-trembak/loregate.git ~/loregate
 
 # 2) Optional: put `lgt` on PATH
-echo 'export PATH="$HOME/cursor-spells/bin:$PATH"' >> ~/.bashrc   # or ~/.zshrc
+echo 'export PATH="$HOME/loregate/bin:$PATH"' >> ~/.bashrc   # or ~/.zshrc
 source ~/.bashrc
 
 # 3) Install into a project (path optional when already inside the repo / multi-repo)
@@ -34,7 +34,7 @@ lgt install /path/to/your-app --agree-policy --language uk  # chat language (--l
 cd /path/to/multi-repo-workspace && lgt update --agree-policy
 ```
 
-**Public policy at install:** you must agree to [`docs/legal/`](docs/legal/) (Privacy, Terms, Disclaimer, NOTICE) before install or update continues. Interactive terminals get a yes/no prompt with paths to those files. Scripts and continuous integration must pass `--agree-policy` / `--i-agree` (or `LGT_AGREE_POLICY=1 (alias CSP_AGREE_POLICY=1)`). Acceptance is recorded in `~/.cursor/lgt-policy-accepted` and, for project installs, also `<project>/.cursor/lgt-policy-accepted`, with `accepted_at`, `agree_via`, `policy_hash`, `policy_docs`, `kit_commit`, and `kit_root`. Matching hash skips the prompt on later runs; a changed policy requires a fresh agreement. A valid user-level acceptance can seed a project marker. Chosen product name **Loregate** / **LGT** (GitHub may still be `cursor-spells`): [`docs/legal/NAME-OPTIONS.md`](docs/legal/NAME-OPTIONS.md).
+**Public policy at install:** you must agree to [`docs/legal/`](docs/legal/) (Privacy, Terms, Disclaimer, NOTICE) before install or update continues. Interactive terminals get a yes/no prompt with paths to those files. Scripts and continuous integration must pass `--agree-policy` / `--i-agree` (or `LGT_AGREE_POLICY=1 (alias CSP_AGREE_POLICY=1)`). Acceptance is recorded in `~/.cursor/lgt-policy-accepted` and, for project installs, also `<project>/.cursor/lgt-policy-accepted`, with `accepted_at`, `agree_via`, `policy_hash`, `policy_docs`, `kit_commit`, and `kit_root`. Matching hash skips the prompt on later runs; a changed policy requires a fresh agreement. A valid user-level acceptance can seed a project marker. Product name **Loregate** / **LGT**; GitHub id [`a-trembak/loregate`](https://github.com/a-trembak/loregate): [`docs/legal/NAME-OPTIONS.md`](docs/legal/NAME-OPTIONS.md).
 
 Useful flags: `--agree-policy` / `--i-agree` (accept public policy), `--humanizer` (also link `english-humanizer`), `--user-only` (only `~/.cursor`, no project files), `--copy` (copy instead of symlink), `--skip-third-party-skills` (do not run `npx skills add` for mapped third-party skills; same as `LGT_SKIP_THIRD_PARTY_SKILLS=1 (alias CSP_SKIP_THIRD_PARTY_SKILLS=1)` on air-gapped machines).
 
@@ -61,7 +61,7 @@ lgt status                     # kit path, commit, what is linked
 3. Else cwd if it contains 2+ immediate child git repos (workspace parent)
 4. Else: `lgt update` refreshes `~/.cursor` only; `lgt install` errors — pass a path or `--user-only`
 
-Installing into the `cursor-spells` kit checkout itself is refused on `install`. On `update`, that case also falls back to refreshing `~/.cursor` only.
+Installing into the Loregate kit checkout itself is refused on `install`. On `update`, that case also falls back to refreshing `~/.cursor` only.
 With **symlink** mode (default), `git pull` in the kit already refreshes skill/command/agent *contents*; `lgt update` still matters to **add new** skills/commands/agents and to **refresh** project hooks/rules. With `--copy`, `lgt update` is required to refresh copied bodies.
 
 ### What install creates
@@ -123,7 +123,7 @@ Runtime markers the agents write later (not created by install): `.cursor/gates/
 3. If a project is targeted (explicit path or auto-detected cwd): refreshes hook scripts, rules, `hooks.json`, and the patterns helper as in the table above.
 
 ```
-~/cursor-spells/          ← one clone (source of truth)
+~/loregate/               ← one clone (source of truth)
         │
         │  lgt install / update
         ▼

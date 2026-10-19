@@ -6,7 +6,7 @@
   "end_to_end": false,
   "status": "active",
   "input": {
-    "invocation": "/csp-finish-plan",
+    "invocation": "/lgt-finish-plan",
     "fetch": "skip"
   },
   "required_stages": [

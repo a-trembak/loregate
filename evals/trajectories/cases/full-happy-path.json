@@ -1,12 +1,12 @@
 {
   "id": "full-happy-path",
-  "title": "Full /csp-start-task on a feature ticket reaches draft pull request through every quality stage",
-  "source": "commands/csp-start-task.md",
+  "title": "Full /lgt-start-task on a feature ticket reaches draft pull request through every quality stage",
+  "source": "commands/lgt-start-task.md",
   "pipeline": "full",
   "end_to_end": true,
   "status": "active",
   "input": {
-    "invocation": "/csp-start-task PROJ-1",
+    "invocation": "/lgt-start-task PROJ-1",
     "fetch": "ok",
     "jira_class": "feature"
   },

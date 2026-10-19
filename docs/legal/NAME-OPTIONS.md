@@ -2,7 +2,7 @@
 
 **Status:** **Loregate** is the **chosen product name**. Short mark / monogram: **LGT**. Tagline: **From lore to merge through gates.**
 
-The GitHub repository may still be named `cursor-spells` until a human renames the remote. Agents must **not** run `gh repo rename` (API often returns 403). In-repo product strings, CLI (`lgt`), and slash commands (`/lgt-*`) use Loregate / LGT now.
+The GitHub repository is **`a-trembak/loregate`** (renamed from `cursor-spells`). Old clone URLs redirect. In-repo product strings, CLI (`lgt`), and slash commands (`/lgt-*`) use Loregate / LGT.
 
 **Do not use “Cursor”, “Claude”, “Codex”, “OpenAI”, or “Anthropic” in the product title** (third-party marks).
 
@@ -64,12 +64,13 @@ Kept for history only.
 
 Legacy CLI name `csp` remains only as a deprecated wrapper; do not invent new `csp` expansions for marketing.
 
-## Human rename step (GitHub)
+## Human rename step (GitHub) — done
 
-Agents cannot rename this repository. When ready:
+Remote is `https://github.com/a-trembak/loregate`. After a local folder rename, point clones at the new URL and path:
 
 ```bash
-gh repo rename loregate --repo a-trembak/cursor-spells
+git remote set-url origin https://github.com/a-trembak/loregate.git
+# optional local folder: mv ~/cursor-spells ~/loregate
 ```
 
-Then confirm README / NOTICE display URLs match the new remote. In-repo product naming (Loregate / LGT) does not wait on that step.
+Keep README / NOTICE display URLs on `a-trembak/loregate`.

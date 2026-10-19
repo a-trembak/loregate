@@ -71,8 +71,9 @@ Chains every stage automatically except the established human-in-the-loop (HITL)
 8. **Update docs** (automatic invocation after propose-commit): invoke skill `update-docs`:
    - **HITL:** `skip` / `docs_md` / `docs_repo` / `confluence` via `hitl-choice` — where product/internal docs should land (current-repo Markdown, a separate docs repo, or Confluence). Never invent the destination.
    - On a non-skip choice, **resolve style first** (required for `docs_repo` / `confluence`): human custom style for user and/or engineer → existing house docs at the destination → kit dual-audience default. Then draft, polish with `english-humanizer` without fighting house voice, and publish.
+   - **Second HITL (conditional):** when the workspace has `escloud-mcp-server/skills/`, ask **MCP skills update** (`mcp_skills` / `skip_mcp_skills`) after the product-docs destination is handled (including product-docs `skip`). On `mcp_skills`, update skill resources under that tree and leave uncommitted. Omit this ask when the path is absent.
    - **Do not end the turn here.** Honor `next_skill` from the skill handoff (`propose-commit` residual and/or `create-pr`).
-9. **Propose commit (residual)** — if `update-docs` left uncommitted intentional files (or returned `next_skill: propose-commit`), invoke **`local-diff-review-gate`** once more, then **`propose-commit`** again.
+9. **Propose commit (residual)** — if `update-docs` left uncommitted intentional files (product docs and/or `escloud-mcp-server`) or returned `next_skill: propose-commit`, invoke **`local-diff-review-gate`** once more, then **`propose-commit`** again.
 10. **Create PR** (automatic): invoke skill **`create-pr`** (push + draft + Pipeline finale) **immediately** after residual propose-commit (or directly after `update-docs` when the tree is clean). Do not expect `create-pr` to invent product commits. Open or reuse a **draft** GitHub PR per changed repo, then the **Pipeline finale** HITL (`keep_draft` / `ready` / Jira comment when a key is known). Gate-marker clear failures at docs must not skip this step.
 
 ### Full-mode notes

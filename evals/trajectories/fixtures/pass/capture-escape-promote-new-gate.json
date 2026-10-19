@@ -1,7 +1,7 @@
 {
   "case_id": "capture-escape-promote-new-gate",
   "input": {
-    "invocation": "/csp-capture-escape",
+    "invocation": "/lgt-capture-escape",
     "fetch": "skip",
     "acceptance_criteria": "Agent skipped review-gate and opened a ready pull request."
   },

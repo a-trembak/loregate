@@ -6,7 +6,7 @@
   "end_to_end": false,
   "status": "active",
   "input": {
-    "invocation": "/csp-critique-plan docs/superpowers/plans/2099-01-01-fixture-notification-plugin.md",
+    "invocation": "/lgt-critique-plan docs/superpowers/plans/2099-01-01-fixture-notification-plugin.md",
     "fetch": "skip"
   },
   "required_stages": ["csp-implementation-critic"],

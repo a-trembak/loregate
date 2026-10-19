@@ -4,7 +4,7 @@
 
 **Effective date:** 29 September 2026
 
-**Product name:** **Loregate** (short mark **LGT**). Tagline: *From lore to merge through gates.* The GitHub repository id may still be `cursor-spells` until a human renames it — see [NAME-OPTIONS.md](NAME-OPTIONS.md).
+**Product name:** **Loregate** (short mark **LGT**). Tagline: *From lore to merge through gates.* GitHub repository: [`a-trembak/loregate`](https://github.com/a-trembak/loregate) (formerly `cursor-spells`) — see [NAME-OPTIONS.md](NAME-OPTIONS.md).
 
 This file is an attribution and rights-reservation notice. It does **not** modify the MIT copyright license stated for the Software in `README.md` / [TERMS.md](TERMS.md). Apache License–style practice treats `NOTICE` contents as informational and separate from the copyright license grant; the same separation is intended here.
 
@@ -18,8 +18,8 @@ Copy and display the following block where attribution is appropriate (repositor
 ================================================================================
   Loregate (LGT)
   Copyright (c) 2026 Andrey Trembak (GitHub: a-trembak)
-  https://github.com/a-trembak/cursor-spells
-  (GitHub repo id may still be cursor-spells until renamed to loregate)
+  https://github.com/a-trembak/loregate
+  (formerly github.com/a-trembak/cursor-spells)
 
   RIGHTS RESERVED (NAMES & IDENTITY)
   The name “Loregate”, the short mark “LGT”, associated pipeline identifiers

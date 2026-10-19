@@ -31,7 +31,7 @@ Record a live ledger (stdlib; same run shape as the fixtures):
 python3 scripts/trajectory-cases.py record init \
   --ledger evals/trajectories/runs/fetch-failure-stops.json \
   --case-id fetch-failure-stops \
-  --invocation "/csp-start-task PROJ-1" \
+  --invocation "/lgt-start-task PROJ-1" \
   --fetch fail
 python3 scripts/trajectory-cases.py record stage --ledger evals/trajectories/runs/fetch-failure-stops.json jira-fetch
 python3 scripts/trajectory-cases.py record artifact --ledger evals/trajectories/runs/fetch-failure-stops.json \

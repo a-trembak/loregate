@@ -1,7 +1,7 @@
 {
   "case_id": "tech-spec-no-invented-facts",
   "input": {
-    "invocation": "/csp-write-tech-spec",
+    "invocation": "/lgt-write-tech-spec",
     "fetch": "skip",
     "acceptance_criteria": "AC-1: As a customer, I can download a file containing my past orders."
   },

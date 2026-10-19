@@ -95,6 +95,17 @@ On `no_figma`, treat as typed `no figma`. On `have_urls`, wait for pasted URLs b
 
 On `docs_repo` / `confluence`, wait for the free-text location details before drafting. `skip` clears the docs gate without writing.
 
+### MCP skills update
+
+Ask only from skill `update-docs` **after** the Docs update destination choice is handled (including product-docs `skip`), and **only** when a workspace root contains `escloud-mcp-server/skills/` with at least one `SKILL.md`. Otherwise omit this gate entirely (`mcp_skills_update: not_applicable`).
+
+| id | label |
+|----|-------|
+| `mcp_skills` | Update Model Context Protocol skill resources under `escloud-mcp-server/skills` |
+| `skip_mcp_skills` | Skip Model Context Protocol skills this run |
+
+Do not reuse product-docs `skip` here — tokens must stay distinct. On `mcp_skills`, wait for the caller skill to write/update skills markdown (leave uncommitted). On `skip_mcp_skills`, continue the `update-docs` handoff without touching that tree.
+
 ### Blocked / pending-accept critic
 
 Build options dynamically:

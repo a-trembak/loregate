@@ -6,7 +6,7 @@
   "end_to_end": false,
   "status": "active",
   "input": {
-    "invocation": "/csp-start-task --fast PROJ-1",
+    "invocation": "/lgt-start-task --fast PROJ-1",
     "fetch": "ok",
     "jira_class": "bug"
   },

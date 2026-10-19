@@ -1,7 +1,7 @@
 {
   "case_id": "review-gate-fixes-to-build",
   "input": {
-    "invocation": "/csp-finish-plan",
+    "invocation": "/lgt-finish-plan",
     "fetch": "skip"
   },
   "stages_entered": ["review-gate", "csp-software-developer", "review-gate"],

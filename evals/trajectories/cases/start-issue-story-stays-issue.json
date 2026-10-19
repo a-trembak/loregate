@@ -1,12 +1,12 @@
 {
   "id": "start-issue-story-stays-issue",
-  "title": "Explicit /csp-start-issue-task stays on the issue path even when the fetched type is Story",
+  "title": "Explicit /lgt-start-issue-task stays on the issue path even when the fetched type is Story",
   "source": "docs/superpowers/dogfood/jira-ac-router-finale-checklist.md",
   "pipeline": "slice",
   "end_to_end": false,
   "status": "active",
   "input": {
-    "invocation": "/csp-start-issue-task PROJ-1",
+    "invocation": "/lgt-start-issue-task PROJ-1",
     "fetch": "ok",
     "jira_class": "feature"
   },

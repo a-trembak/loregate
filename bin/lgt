@@ -3,8 +3,8 @@
 # Short mark: LGT. Tagline: From lore to merge through gates.
 #
 # One-time:
-#   git clone <this-repo> ~/cursor-spells
-#   ~/cursor-spells/bin/lgt install /path/to/your-app
+#   git clone <this-repo> ~/loregate
+#   ~/loregate/bin/lgt install /path/to/your-app
 #
 # Later:
 #   lgt update /path/to/your-app     # git pull kit + re-sync links & project files

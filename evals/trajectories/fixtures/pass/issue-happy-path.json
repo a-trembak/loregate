@@ -1,7 +1,7 @@
 {
   "case_id": "issue-happy-path",
   "input": {
-    "invocation": "/csp-start-issue-task PROJ-1",
+    "invocation": "/lgt-start-issue-task PROJ-1",
     "fetch": "ok",
     "jira_class": "bug"
   },

@@ -1,12 +1,12 @@
 {
   "id": "route-bug-to-issue",
-  "title": "Classified Bug on /csp-start-task enters the issue pipeline without re-fetching",
+  "title": "Classified Bug on /lgt-start-task enters the issue pipeline without re-fetching",
   "source": "docs/superpowers/dogfood/jira-ac-router-finale-checklist.md",
   "pipeline": "slice",
   "end_to_end": false,
   "status": "active",
   "input": {
-    "invocation": "/csp-start-task PROJ-1",
+    "invocation": "/lgt-start-task PROJ-1",
     "fetch": "ok",
     "jira_class": "bug"
   },
@@ -30,6 +30,6 @@
     "jira_status": "In Progress",
     "pull_request": "absent",
     "review_report": "absent",
-    "notes": "Handoff is /csp-start-issue-task from its step 3 using the already-fetched issue."
+    "notes": "Handoff is /lgt-start-issue-task from its step 3 using the already-fetched issue."
   }
 }

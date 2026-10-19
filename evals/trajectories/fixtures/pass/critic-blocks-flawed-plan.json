@@ -1,7 +1,7 @@
 {
   "case_id": "critic-blocks-flawed-plan",
   "input": {
-    "invocation": "/csp-critique-plan docs/superpowers/plans/2099-01-01-fixture-notification-plugin.md",
+    "invocation": "/lgt-critique-plan docs/superpowers/plans/2099-01-01-fixture-notification-plugin.md",
     "fetch": "skip"
   },
   "stages_entered": ["csp-implementation-critic"],
