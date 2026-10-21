@@ -2,7 +2,7 @@
 
 ## Status
 
-`draft` — awaiting human review before implementation plan.
+`approved` — human reviewed; implementation plan `docs/superpowers/plans/2026-10-21-ide-context-spend-statusbar.md`.
 
 ## Goal
 
