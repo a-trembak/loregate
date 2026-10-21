@@ -5,7 +5,7 @@ alwaysApply: true
 
 # HITL AskQuestion required
 
-For every **closed-set** human-in-the-loop gate in this kit (`approve-plan` / `revise`, `approve-spec` / `skip`, finish-plan `skip` / `approve` / `done` / `fixes`, Local Diff Review gate `approve-diff` / `comment`, docs destination, tech-spec `human` / `agent`, tech-spec depth `light` / `full` (agent mode only), Decision/Blocker options, blocked-critic `accept F<id>`, engineer-review `Ci:X`, Figma `no_figma` / `have_urls`, Propose commit `approve-commit` / `revise`):
+For every **closed-set** human-in-the-loop gate in this kit (`approve-plan` / `revise`, `approve-spec` / `skip`, finish-plan `skip` / `approve` / `done` / `fixes`, Local Diff Review gate `approve-diff` / `comment`, docs destination, tech-spec `human` / `agent`, tech-spec depth `light` / `full` (agent mode only), Decision/Blocker options, blocked-critic `accept F<id>`, engineer-review `Ci:X`, Figma `no_figma` / `have_urls`, Enable Figma MCP `figma_enabled` / `skip_figma_mcp`, Propose commit `approve-commit` / `revise`):
 
 1. Use skill **`hitl-choice`**.
 2. **Call** the interactive question tool as the first action (`AskQuestion` → `AskUserQuestion` → `ask_question` → `ask_user` / `request_user_input`).

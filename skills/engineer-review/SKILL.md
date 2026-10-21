@@ -39,6 +39,8 @@ Manual `/lgt-engineer-review` skips this gate.
 
 After HITL approval (or at the start of manual review), if stack is `react-web` or `react-native`, ask **before** phase dispatch via skill **`hitl-choice`** preset **Figma ask** (AskQuestion required; text fallback only after failed/missing tool: paste links or `no figma`).
 
+**Enable Figma MCP first when tools are missing:** if the live catalog has no usable Figma Model Context Protocol tools, ask preset **Enable Figma MCP** (`figma_enabled` / `skip_figma_mcp`) **before** **Figma ask** and before dispatching `csp-review-figma-markup`. On `skip_figma_mcp` or persistent miss after `figma_enabled`, note `figma_mcp: unavailable` / `skill_missing: figma-mcp` and continue non-Figma phases (Coverage `figma_markup: skipped` or `source-only` as phase rules already allow).
+
 Pass URLs into clarifications for `csp-review-figma-markup`. Do not block other phases on the answer if the user already said `no figma` / `no_figma`; if they have not answered yet, run non-figma phases first and keep figma skipped until URLs arrive.
 
 ## Spine (do this in order)
