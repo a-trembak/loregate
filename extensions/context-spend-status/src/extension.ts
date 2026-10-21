@@ -6,7 +6,11 @@ import { formatOutput, formatStatusText } from "./format";
 import { hintForStage } from "./hints";
 import { fetchPipelineOrientation } from "./pipelineStatus";
 import { pickWorkspaceFolder } from "./resolveFolder";
-import { loadSnapshots, metricsForSession } from "./snapshots";
+import {
+  latestSessionSnapshots,
+  loadSnapshots,
+  metricsForSession,
+} from "./snapshots";
 
 const COMMAND = "loregate.contextSpend.show";
 const REFRESH_INTERVAL_MS = 3000;
@@ -75,7 +79,9 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
 
-      const snapshots = loadSnapshots(readFile(snapshotsPath) ?? "");
+      const snapshots = latestSessionSnapshots(
+        loadSnapshots(readFile(snapshotsPath) ?? "")
+      );
       const latestSnapshot = snapshots.at(-1);
       const metrics =
         latestSnapshot === undefined
@@ -84,7 +90,9 @@ export function activate(context: vscode.ExtensionContext): void {
               snapshots,
               latestSnapshot.session_id,
               orientation.stage,
-              latestSnapshot.ctx_pct
+              latestSnapshot.stage === orientation.stage
+                ? latestSnapshot.ctx_pct
+                : null
             );
       const hint = hintForStage(orientation.stage) ?? null;
 

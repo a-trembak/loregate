@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  latestSessionSnapshots,
   loadSnapshots,
   metricsForSession,
   type Snapshot,
@@ -48,7 +49,7 @@ test("computes peak across contiguous stage runs and current alert", () => {
   });
 });
 
-test("computes current delta from latest matching stage run when session ends elsewhere", () => {
+test("does not compute current delta when session ends in another stage", () => {
   const snapshots: Snapshot[] = [
     snapshot("s1", 10, "build"),
     snapshot("s1", 20, "build"),
@@ -57,11 +58,38 @@ test("computes current delta from latest matching stage run when session ends el
   ];
 
   assert.deepEqual(metricsForSession(snapshots, "s1", "build", 66), {
-    deltaStagePp: 56,
+    deltaStagePp: null,
     peakStage: "build",
     peakPp: 10,
-    alert: true,
+    alert: false,
   });
+});
+
+test("keeps only the latest recent session", () => {
+  const now = Date.parse("2026-10-21T12:00:00Z");
+  const snapshots: Snapshot[] = [
+    snapshotAt("old", 5, "plan", "2026-10-19T12:00:00Z"),
+    snapshotAt("s1", 10, "plan", "2026-10-21T10:00:00Z"),
+    snapshotAt("s2", 20, "build", "2026-10-21T11:00:00Z"),
+    snapshotAt("s1", 30, "plan", "2026-10-21T11:30:00Z"),
+  ];
+
+  assert.deepEqual(latestSessionSnapshots(snapshots, now), [
+    snapshots[1],
+    snapshots[3],
+  ]);
+});
+
+test("ignores snapshots when none are newer than twenty-four hours", () => {
+  const now = Date.parse("2026-10-21T12:00:00Z");
+
+  assert.deepEqual(
+    latestSessionSnapshots(
+      [snapshotAt("old", 5, "plan", "2026-10-20T11:59:59Z")],
+      now
+    ),
+    []
+  );
 });
 
 test("uses the latest contiguous run for the current stage", () => {
@@ -123,8 +151,22 @@ test("returns empty metrics when the session has no snapshots", () => {
 });
 
 function snapshot(session_id: string, ctx_pct: number, stage: string): Snapshot {
+  return snapshotAt(
+    session_id,
+    ctx_pct,
+    stage,
+    "2026-10-21T10:00:00Z"
+  );
+}
+
+function snapshotAt(
+  session_id: string,
+  ctx_pct: number,
+  stage: string,
+  ts: string
+): Snapshot {
   return {
-    ts: "2026-10-21T10:00:00Z",
+    ts,
     session_id,
     ctx_pct,
     stage,

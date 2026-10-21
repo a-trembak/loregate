@@ -41,6 +41,29 @@ export function loadSnapshots(jsonl: string): Snapshot[] {
   return snapshots;
 }
 
+export function latestSessionSnapshots(
+  snapshots: Snapshot[],
+  nowMs = Date.now(),
+  maxAgeMs = 24 * 60 * 60 * 1000
+): Snapshot[] {
+  // Keep metrics bounded to the newest session seen within the last 24 hours.
+  const recentSnapshots = snapshots.filter((snapshot) => {
+    const timestamp = Date.parse(snapshot.ts);
+    return (
+      Number.isFinite(timestamp) &&
+      timestamp <= nowMs &&
+      timestamp >= nowMs - maxAgeMs
+    );
+  });
+  const latestSessionId = recentSnapshots.at(-1)?.session_id;
+
+  return latestSessionId === undefined
+    ? []
+    : recentSnapshots.filter(
+        (snapshot) => snapshot.session_id === latestSessionId
+      );
+}
+
 export function metricsForSession(
   snapshots: Snapshot[],
   sessionId: string,
@@ -55,6 +78,7 @@ export function metricsForSession(
     return emptyMetrics();
   }
 
+  const latestSnapshot = sessionSnapshots.at(-1);
   const runs = stageRuns(sessionSnapshots);
   let peakStage: string | null = null;
   let peakPp: number | null = null;
@@ -67,7 +91,7 @@ export function metricsForSession(
     }
   }
 
-  if (currentCtx === null) {
+  if (currentCtx === null || latestSnapshot?.stage !== currentStage) {
     return {
       deltaStagePp: null,
       peakStage,
