@@ -76,11 +76,10 @@ export function metricsForSession(
     };
   }
 
-  const currentRun = runs.at(-1);
-  const deltaStagePp =
-    currentRun?.stage === currentStage
-      ? currentCtx - currentRun.firstCtx
-      : null;
+  const currentStageRun = latestRunForStage(runs, currentStage);
+  const deltaStagePp = currentStageRun
+    ? currentCtx - currentStageRun.firstCtx
+    : null;
 
   return {
     deltaStagePp,
@@ -125,6 +124,18 @@ function stageRuns(snapshots: Snapshot[]): StageRun[] {
   }
 
   return runs;
+}
+
+function latestRunForStage(
+  runs: StageRun[],
+  stage: string
+): StageRun | undefined {
+  for (let i = runs.length - 1; i >= 0; i -= 1) {
+    if (runs[i].stage === stage) {
+      return runs[i];
+    }
+  }
+  return undefined;
 }
 
 function emptyMetrics(): SpendMetrics {

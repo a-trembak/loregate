@@ -48,6 +48,22 @@ test("computes peak across contiguous stage runs and current alert", () => {
   });
 });
 
+test("computes current delta from latest matching stage run when session ends elsewhere", () => {
+  const snapshots: Snapshot[] = [
+    snapshot("s1", 10, "build"),
+    snapshot("s1", 20, "build"),
+    snapshot("s1", 45, "review-gate"),
+    snapshot("s1", 48, "review-gate"),
+  ];
+
+  assert.deepEqual(metricsForSession(snapshots, "s1", "build", 66), {
+    deltaStagePp: 56,
+    peakStage: "build",
+    peakPp: 10,
+    alert: true,
+  });
+});
+
 test("uses the latest contiguous run for the current stage", () => {
   const snapshots: Snapshot[] = [
     snapshot("s1", 10, "build"),
