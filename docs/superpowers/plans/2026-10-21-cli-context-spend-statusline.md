@@ -47,7 +47,7 @@
 - Produces: line 1 shape `cursor  <model>  ctx <N>%  <bar>  ring` (or `ctx —`); temporary line 2 may be `pipe  —  (no loregate gates)` until Task 3
 - Env overrides for tests: `STATUSLINE_LOREGATE_ROOT` (force project root instead of payload cwd), `STATUSLINE_LOREGATE_NOW_MS` (fake clock for debounce later)
 
-- [ ] **Step 1: Write the failing test file**
+- [x] **Step 1: Write the failing test file**
 
 Create `scripts/tests/statusline-loregate-test.sh`:
 
@@ -124,12 +124,12 @@ fi
 echo "ALL PASS"
 ```
 
-- [ ] **Step 2: Run test — expect FAIL (script missing)**
+- [x] **Step 2: Run test — expect FAIL (script missing)**
 
 Run: `bash scripts/tests/statusline-loregate-test.sh`  
 Expected: `FAIL script_missing` or missing executable.
 
-- [ ] **Step 3: Implement minimal `scripts/statusline-loregate.sh`**
+- [x] **Step 3: Implement minimal `scripts/statusline-loregate.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -183,12 +183,12 @@ PY
 
 `chmod +x scripts/statusline-loregate.sh`
 
-- [ ] **Step 4: Run tests — expect PASS for Task 1 assertions**
+- [x] **Step 4: Run tests — expect PASS for Task 1 assertions**
 
 Run: `bash scripts/tests/statusline-loregate-test.sh`  
 Expected: `ALL PASS`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/statusline-loregate.sh scripts/tests/statusline-loregate-test.sh
@@ -216,7 +216,7 @@ EOF
 - Produces metrics for line 2 later: `delta_stage_pp`, `peak_stage`, `peak_pp`, `alert` bool
 - Rules: write if stage changed OR `|ctx - last_ctx| >= 1`; debounce if `now_ms - last_write_ms < 2000` unless stage changed; on write trim file to last 500 lines; new `session_id` ignores prior session rows for peak/delta
 
-- [ ] **Step 1: Extend tests**
+- [x] **Step 1: Extend tests**
 
 Append to `scripts/tests/statusline-loregate-test.sh` (keep prior asserts):
 
@@ -266,12 +266,12 @@ fi
 unset STATUSLINE_LOREGATE_STAGE STATUSLINE_LOREGATE_ROUTE STATUSLINE_LOREGATE_NOW_MS
 ```
 
-- [ ] **Step 2: Run tests — expect FAIL on missing peak/snapshot behavior**
+- [x] **Step 2: Run tests — expect FAIL on missing peak/snapshot behavior**
 
 Run: `bash scripts/tests/statusline-loregate-test.sh`  
 Expected: FAIL on `peak_tech` / `snap_exists` until implemented.
 
-- [ ] **Step 3: Implement snapshot + metrics inside the Python worker**
+- [x] **Step 3: Implement snapshot + metrics inside the Python worker**
 
 Replace the placeholder worker with logic that:
 
@@ -292,12 +292,12 @@ Omit `peak:…` if no completed stage delta yet; omit `⚠` when below threshold
 
 Include exact Python in the script (no second file). Keep `bar()` and line 1 behavior from Task 1.
 
-- [ ] **Step 4: Run tests — expect ALL PASS**
+- [x] **Step 4: Run tests — expect ALL PASS**
 
 Run: `bash scripts/tests/statusline-loregate-test.sh`  
 Expected: `ALL PASS`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/statusline-loregate.sh scripts/tests/statusline-loregate-test.sh
@@ -336,7 +336,7 @@ EOF
 
 - Truncate line 2 to `render_width_chars` (default 120); if truncating under alert, keep `⚠` and `hint` suffixes preferentially.
 
-- [ ] **Step 1: Extend tests with a fake `pipeline-status.sh`**
+- [x] **Step 1: Extend tests with a fake `pipeline-status.sh`**
 
 ```bash
 FAKE="$TMP/fakepipe"
@@ -362,9 +362,9 @@ out_e="$(run_sl "$EMPTY" '{"session_id":"e1","cwd":"'"$EMPTY"'","model":{"displa
 assert_contains no_gates "$out_e" "(no loregate gates)"
 ```
 
-- [ ] **Step 2: Run — expect FAIL until resolver/hints exist**
+- [x] **Step 2: Run — expect FAIL until resolver/hints exist**
 
-- [ ] **Step 3: Implement resolver + hints in the Python worker**
+- [x] **Step 3: Implement resolver + hints in the Python worker**
 
 ```python
 def resolve_route_stage(root: Path) -> tuple[str, str, bool]:
@@ -417,11 +417,11 @@ Honor `STATUSLINE_LOREGATE_STAGE` / `ROUTE` when set (tests). Subprocess only wh
 
 Wire line 2 + truncation. Cap subprocess at 1.5s so CLI `timeoutMs=2000` still has margin.
 
-- [ ] **Step 4: Run full test file — ALL PASS**
+- [x] **Step 4: Run full test file — ALL PASS**
 
 Run: `bash scripts/tests/statusline-loregate-test.sh`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/statusline-loregate.sh scripts/tests/statusline-loregate-test.sh
@@ -449,7 +449,7 @@ EOF
 - Print one English line: how to set `statusLine` in `~/.cursor/cli-config.json` (do **not** silently rewrite user’s cli-config)
 - README: enable snippet, example two lines, meaning of `pp` / `peak` / `⚠` / `hint`, pointer to design spec
 
-- [ ] **Step 1: Failing install grep test**
+- [x] **Step 1: Failing install grep test**
 
 ```bash
 # scripts/tests/statusline-loregate-install-test.sh
@@ -463,7 +463,7 @@ echo "ALL PASS"
 
 Run — expect FAIL until installer/README updated.
 
-- [ ] **Step 2: Patch `install_user_bits`**
+- [x] **Step 2: Patch `install_user_bits`**
 
 Inside `install_user_bits`, after rules copies:
 
@@ -474,9 +474,9 @@ Inside `install_user_bits`, after rules copies:
   echo "hint: enable Cursor CLI statusLine → command ~/.cursor/statusline-loregate.sh (see README)"
 ```
 
-- [ ] **Step 3: README section** (English), ~15–25 lines: enable JSON, example render, `pp` definition, hint legend table (short), link to design spec. State proxies ≠ billing.
+- [x] **Step 3: README section** (English), ~15–25 lines: enable JSON, example render, `pp` definition, hint legend table (short), link to design spec. State proxies ≠ billing.
 
-- [ ] **Step 4: Design Status `approved` + dogfood checklist**
+- [x] **Step 4: Design Status `approved` + dogfood checklist**
 
 Dogfood checklist bullets:
 1. `lgt install --user-only` (or project install) copies script
@@ -486,7 +486,7 @@ Dogfood checklist bullets:
 5. Confirm empty project shows no-gates line
 6. Confirm script failure does not freeze prompt
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
 
 ```bash
 bash scripts/tests/statusline-loregate-test.sh
@@ -495,7 +495,7 @@ bash scripts/tests/statusline-loregate-install-test.sh
 
 Expected: both `ALL PASS`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/install-to-project.sh scripts/tests/statusline-loregate-install-test.sh README.md \

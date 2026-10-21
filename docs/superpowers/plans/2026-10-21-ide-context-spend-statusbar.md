@@ -106,7 +106,7 @@ Hint map (exact tokens from CLI design):
 | docs, update-docs, docs-gate | short-docs |
 | create-pr, finale | short-pr |
 
-- [ ] **Step 1: Scaffold `package.json` + `tsconfig.json`**
+- [x] **Step 1: Scaffold `package.json` + `tsconfig.json`**
 
 `package.json` essentials:
 
@@ -134,7 +134,7 @@ Hint map (exact tokens from CLI design):
 
 `tsconfig.json`: `rootDir` `src`, `outDir` `out`, `module` `commonjs`, `target` `ES2022`, `strict` true. Exclude nothing needed for tests co-located in `src/`.
 
-- [ ] **Step 2: Write failing tests** for `hintForStage('review-gate') === 'cut-clarify'`, `formatStatusText` no-gates / with alert, `metricsForSession` peak and alert ≥15.
+- [x] **Step 2: Write failing tests** for `hintForStage('review-gate') === 'cut-clarify'`, `formatStatusText` no-gates / with alert, `metricsForSession` peak and alert ≥15.
 
 Example `format.test.ts`:
 
@@ -163,19 +163,19 @@ test("with alert", () => {
 });
 ```
 
-- [ ] **Step 3: Run tests — expect FAIL**
+- [x] **Step 3: Run tests — expect FAIL**
 
 ```bash
 cd extensions/context-spend-status && npm install && npm test
 ```
 
-- [ ] **Step 4: Implement modules until PASS**
+- [x] **Step 4: Implement modules until PASS**
 
 `hasPipeline` false → no-gates string. Alert only when `alertPp != null`. Prefer exact stage match before substring in `hintForStage`.
 
 Peak algorithm: for one `session_id`, group contiguous same-`stage` runs; each run’s pp = last.ctx_pct − first.ctx_pct; peak = max positive run; current `deltaStagePp` = current ctx − first ctx of current stage run (if `currentCtx` null, deltas null, alert false).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add extensions/context-spend-status
@@ -224,11 +224,11 @@ Helper path order:
 
 Run: `bash <helper> --json --root <root>` with timeout 1500ms via `AbortSignal` / kill.
 
-- [ ] **Step 1: Tests for `pickWorkspaceFolder` and helper path resolution** (fake fs)
+- [x] **Step 1: Tests for `pickWorkspaceFolder` and helper path resolution** (fake fs)
 
-- [ ] **Step 2: Implement resolve + fetch**
+- [x] **Step 2: Implement resolve + fetch**
 
-- [ ] **Step 3: Implement `extension.ts`**
+- [x] **Step 3: Implement `extension.ts`**
 
 ```typescript
 import * as vscode from "vscode";
@@ -250,9 +250,9 @@ Refresh body:
 6. `item.tooltip = ...`
 7. Store last `formatOutput` payload for click
 
-- [ ] **Step 4: `npm run compile` succeeds; manual smoke optional**
+- [x] **Step 4: `npm run compile` succeeds; manual smoke optional**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -298,7 +298,7 @@ echo "hint: Reload Window to enable Loregate Context Spend status bar (Agent Win
 
 If compile fails: one warning line; do not fail entire `lgt install`.
 
-- [ ] **Step 1: Failing install grep test**
+- [x] **Step 1: Failing install grep test**
 
 ```bash
 #!/usr/bin/env bash
@@ -310,20 +310,20 @@ test -f "$ROOT/extensions/context-spend-status/package.json"
 echo "ALL PASS"
 ```
 
-- [ ] **Step 2: Implement installer + README + dogfood checklist**
+- [x] **Step 2: Implement installer + README + dogfood checklist**
 
 Dogfood steps: install → Reload → mid-pipeline status text → click Output → empty project no-gates → missing helper does not freeze.
 
-- [ ] **Step 3: Mark design `approved`**
+- [x] **Step 3: Mark design `approved`**
 
-- [ ] **Step 4: Run**
+- [x] **Step 4: Run**
 
 ```bash
 bash scripts/tests/ide-context-spend-statusbar-install-test.sh
 cd extensions/context-spend-status && npm test
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git commit -m "$(cat <<'EOF'

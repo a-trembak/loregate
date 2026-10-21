@@ -13,13 +13,15 @@ Manual checks for the Loregate Context Spend extension in Cursor Agent Window / 
 
 2. **Developer: Reload Window** (Command Palette) so Cursor loads the copied extension.
 
-3. Open a **consumer** project mid-pipeline (active gate markers or run-log stage). Confirm the IDE status bar shows compact `pipe …` text that updates every few seconds.
+3. Open a **consumer** project mid-pipeline (active gate markers or run-log stage). Confirm the IDE status bar shows compact `pipe …` text that updates every few seconds (route and stage even without snapshots).
 
-4. Click the status bar item and confirm the **Output** channel opens with peak, hint, and snapshot path details.
+4. With **CLI status line enabled** in that project (so `.cursor/gates/context-spend/snapshots.jsonl` exists), confirm peak / ⚠ can appear when deltas warrant it. Without that file, expect stage-only (no invented peak).
 
-5. Open an empty project with no Loregate gates and confirm the status text shows the no-gates message (no freeze, no endless spinner).
+5. Click the status bar item and confirm the **Output** channel opens with hint, snapshot path, and the ring-% note for CLI.
 
-6. Temporarily rename `scripts/pipeline-status.sh` in the project (or point at a folder without helpers) and confirm the status bar still updates (fallback / timeout) — the IDE must not hang.
+6. Open an empty project with no Loregate gates and confirm the status text shows the no-gates message (no freeze, no endless spinner).
+
+7. Temporarily rename `scripts/pipeline-status.sh` in the project (or point at a folder without helpers) and confirm the status bar still updates (fallback / timeout) — the IDE must not hang.
 
 ## Reference
 

@@ -129,7 +129,9 @@ Full behavior, snapshot rules, and stage mapping: [`docs/superpowers/specs/2026-
 
 Install copies the compiled extension from `extensions/context-spend-status/` to `~/.cursor/extensions/loregate-context-spend-status-<version>/` (package manifest, README, and `out/` only). **Reload Window** once after install or update so Cursor loads it.
 
-The status bar shows the same pipeline proxies as the CLI status line (`pipe …`, peak, ⚠ threshold) for Agent Window users. Click the item to open an Output channel with drill-down text.
+The status bar shows pipeline **route and stage** (`pipe …`) for Agent Window users. Click the item to open an Output channel with drill-down text.
+
+**Peak / ⚠ deltas need snapshots.** The IDE extension does **not** see Cursor’s context-ring percentage, so it does not write `.cursor/gates/context-spend/snapshots.jsonl`. Those files are written by the **CLI** status line above. With Agent Window only, you still see stage; peak and the 15pp warning appear after the CLI status line has recorded snapshots in that project (same store both surfaces read).
 
 Design: [`docs/superpowers/specs/2026-10-21-ide-context-spend-statusbar-design.md`](docs/superpowers/specs/2026-10-21-ide-context-spend-statusbar-design.md). Manual checks: [`docs/superpowers/dogfood/ide-context-spend-statusbar-checklist.md`](docs/superpowers/dogfood/ide-context-spend-statusbar-checklist.md).
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-`approved` — human reviewed; implementation plan `docs/superpowers/plans/2026-10-21-cli-context-spend-statusline.md`.
+`implemented` — shipped in main (#97). Implementation plan `docs/superpowers/plans/2026-10-21-cli-context-spend-statusline.md`.
 
 ## Goal
 

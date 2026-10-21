@@ -2,7 +2,7 @@
 
 ## Status
 
-`approved` — human reviewed; implementation plan `docs/superpowers/plans/2026-10-21-ide-context-spend-statusbar.md`.
+`implemented` — shipped on `feat/ide-context-spend-statusbar` (extension + `lgt install` copy). Implementation plan `docs/superpowers/plans/2026-10-21-ide-context-spend-statusbar.md`.
 
 ## Goal
 
