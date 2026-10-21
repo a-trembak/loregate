@@ -1,0 +1,25 @@
+{
+  "name": "loregate-context-spend-status",
+  "displayName": "Loregate Context Spend",
+  "version": "0.0.1",
+  "publisher": "loregate",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p .",
+    "test": "npm run compile && node --test out/**/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0"
+  }
+}
