@@ -146,6 +146,15 @@ def stage_metrics(rows: list[dict], ctx_pct: int, stage: str) -> tuple[int, str,
 
     return delta_stage_pp, peak_stage, peak_pp
 
+def try_ensure_spend_dir(spend_dir: Path) -> bool:
+    if spend_dir.is_dir():
+        return True
+    try:
+        spend_dir.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        return spend_dir.is_dir()
+    return spend_dir.is_dir()
+
 def record_snapshot(
     root: str,
     session_id: str,
@@ -156,11 +165,10 @@ def record_snapshot(
     now_ms: int,
 ) -> tuple[int, str, int]:
     spend_dir = Path(root) / ".cursor" / "gates" / "context-spend"
-    spend_dir.mkdir(parents=True, exist_ok=True)
     snapshots_path = spend_dir / "snapshots.jsonl"
     state_path = spend_dir / "state.json"
 
-    all_rows = load_snapshots(snapshots_path)
+    all_rows = load_snapshots(snapshots_path) if snapshots_path.is_file() else []
     session_rows = [
         row for row in all_rows if str(row.get("session_id", "")) == session_id
     ]
@@ -197,24 +205,28 @@ def record_snapshot(
             "invocation_id": invocation_id,
         }
         all_rows.append(row)
-        snapshots_path.write_text(
-            "".join(
-                json.dumps(item, separators=(",", ":")) + "\n"
-                for item in all_rows[-500:]
-            )
-        )
-        state_path.write_text(
-            json.dumps(
-                {
-                    "last_write_ms": now_ms,
-                    "last_ctx_pct": ctx_pct,
-                    "last_stage": stage,
-                    "session_id": session_id,
-                },
-                separators=(",", ":"),
-            )
-            + "\n"
-        )
+        if try_ensure_spend_dir(spend_dir):
+            try:
+                snapshots_path.write_text(
+                    "".join(
+                        json.dumps(item, separators=(",", ":")) + "\n"
+                        for item in all_rows[-500:]
+                    )
+                )
+                state_path.write_text(
+                    json.dumps(
+                        {
+                            "last_write_ms": now_ms,
+                            "last_ctx_pct": ctx_pct,
+                            "last_stage": stage,
+                            "session_id": session_id,
+                        },
+                        separators=(",", ":"),
+                    )
+                    + "\n"
+                )
+            except OSError:
+                pass
 
     return delta_stage_pp, peak_stage, peak_pp
 

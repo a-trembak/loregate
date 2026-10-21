@@ -153,6 +153,28 @@ out_e="$(run_sl "$EMPTY" '{"session_id":"e1","cwd":"'"$EMPTY"'","model":{"displa
 assert_contains no_gates "$out_e" "(no loregate gates)"
 unset STATUSLINE_LOREGATE_NOW_MS
 
+# Unwritable snapshot dir must not traceback; stdout still renders two lines
+ROPROJ="$TMP/ro-spend"
+mkdir -p "$ROPROJ"
+chmod a-w "$ROPROJ"
+export STATUSLINE_LOREGATE_STAGE=plan
+export STATUSLINE_LOREGATE_ROUTE=full
+export STATUSLINE_LOREGATE_NOW_MS=4000000
+p_ro='{"session_id":"ro1","cwd":"'"$ROPROJ"'","model":{"display_name":"Opus"},"context_window":{"used_percentage":30},"render_width_chars":120}'
+ro_stderr="$TMP/ro_stderr.txt"
+: >"$ro_stderr"
+ro_out="$(STATUSLINE_LOREGATE_ROOT="$ROPROJ" "$SCRIPT" <<<"$p_ro" 2>"$ro_stderr")"
+chmod a+w "$ROPROJ"
+if grep -q Traceback "$ro_stderr" 2>/dev/null; then
+  echo "FAIL snap_write_no_traceback: stderr had Traceback" >&2
+  cat "$ro_stderr" >&2
+  fail=1
+else
+  echo "OK   snap_write_no_traceback"
+fi
+assert_contains snap_write_still_renders "$ro_out" "pipe  full·plan"
+unset STATUSLINE_LOREGATE_STAGE STATUSLINE_LOREGATE_ROUTE STATUSLINE_LOREGATE_NOW_MS
+
 if [[ "$fail" -ne 0 ]]; then
   echo "FAILED" >&2
   exit 1

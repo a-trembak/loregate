@@ -109,7 +109,7 @@ pipe  full·eng-review  +12pp/stage  peak:tech-spec(+28)  ⚠+18  hint:cut-clari
 
 - **pp** — percentage points on the context ring scale (`50%` → `68%` is **+18pp**, not “+18% of 50”).
 - **peak:&lt;stage&gt;(+N)** — largest per-stage ring growth this session; use it to pick which pipeline stage to thin first.
-- **⚠+N** — current stage grew by ≥ **15** pp since the last snapshot (alert threshold).
+- **⚠+N** — same number as **+Npp/stage** when that per-stage delta is ≥ **15** (alert threshold; growth since this stage started in the session).
 - **hint:&lt;token&gt;** — fixed optimization lever for the **current** stage only (not for peak).
 
 | Hint token | Typical lever |
@@ -123,6 +123,8 @@ pipe  full·eng-review  +12pp/stage  peak:tech-spec(+28)  ⚠+18  hint:cut-clari
 | `short-docs` / `short-pr` | Trim docs or pull-request body bulk |
 
 Full behavior, snapshot rules, and stage mapping: [`docs/superpowers/specs/2026-10-21-cli-context-spend-statusline-design.md`](docs/superpowers/specs/2026-10-21-cli-context-spend-statusline-design.md). Manual checks: [`docs/superpowers/dogfood/cli-context-spend-statusline-checklist.md`](docs/superpowers/dogfood/cli-context-spend-statusline-checklist.md).
+
+Consumer projects may add `.cursor/gates/context-spend/` to `.gitignore` if they do not want debounced context snapshots in version control.
 
 #### B) `<project>/` (path argument, or auto-detected cwd repo / multi-repo workspace)
 
