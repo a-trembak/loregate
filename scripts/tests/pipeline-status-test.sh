@@ -210,7 +210,7 @@ else
 fi
 rm -f "$src_stdout" "$src_stderr"
 
-# --- Canvas URL shape ---
+# --- Canvas URL shape (browser URL may include query+hash; not for chat file links) ---
 ps_use_root "$REV"
 canvas_url="$("$SCRIPT" --canvas-url --root "$REV" --kit-root "$ROOT")"
 assert_contains canvas_route "$canvas_url" "route=full"
@@ -226,6 +226,17 @@ strip="$("$SCRIPT" --root "$REV")"
 assert_contains strip_route "$strip" "full"
 assert_contains strip_layer "$strip" "review"
 assert_contains strip_stage "$strip" "review-gate"
+# Chat-openable Canvas line: absolute path, no ?query (Cursor File not found otherwise)
+canvas_line="$(printf '%s\n' "$strip" | grep '^Canvas:' | head -1)"
+assert_contains strip_canvas_file "$canvas_line" "pipeline-flow.html"
+if printf '%s' "$canvas_line" | grep -q '[?#]'; then
+  echo "FAIL strip_canvas_bare_path: Canvas: line must not include ? or # ($canvas_line)" >&2
+  fail=1
+else
+  echo "OK   strip_canvas_bare_path"
+fi
+assert_contains strip_canvas_highlight "$strip" "Canvas highlight:"
+assert_contains strip_canvas_highlight_route "$strip" "route=full"
 
 # --- Required JSON keys ---
 keys="$(json_field "$rev_json" '",".join(sorted(d.keys()))')"

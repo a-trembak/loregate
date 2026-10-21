@@ -324,6 +324,33 @@ sync_kit_entries_into() {
   echo "wrote: $cursor_root/cursor-spells-kit-path"
 }
 
+# Pipeline flow HTML for Cursor chat file links (bare path, no ?query).
+# User home copy works with open_resource; project copy keeps the path inside
+# the agent workspace after lgt install.
+install_pipeline_canvas_user() {
+  mkdir -p "$HOME/.cursor/pipeline-canvases"
+  cp "$KIT_ROOT/docs/superpowers/pipeline-flow.html" "$HOME/.cursor/pipeline-canvases/pipeline-flow.html"
+  echo "copied: $HOME/.cursor/pipeline-canvases/pipeline-flow.html"
+}
+
+install_pipeline_canvas_into_project() {
+  mkdir -p "$PROJECT/docs/superpowers"
+  # Replace a stale symlink-to-kit with a real file so reinstalling the kit
+  # does not break consumer chat links.
+  if [[ -L "$PROJECT/docs/superpowers/pipeline-flow.html" ]]; then
+    rm -f "$PROJECT/docs/superpowers/pipeline-flow.html"
+  fi
+  cp "$KIT_ROOT/docs/superpowers/pipeline-flow.html" "$PROJECT/docs/superpowers/pipeline-flow.html"
+  echo "copied: $PROJECT/docs/superpowers/pipeline-flow.html"
+  if [[ -f "$KIT_ROOT/docs/superpowers/pipeline-flow.md" ]]; then
+    if [[ -L "$PROJECT/docs/superpowers/pipeline-flow.md" ]]; then
+      rm -f "$PROJECT/docs/superpowers/pipeline-flow.md"
+    fi
+    cp "$KIT_ROOT/docs/superpowers/pipeline-flow.md" "$PROJECT/docs/superpowers/pipeline-flow.md"
+    echo "copied: $PROJECT/docs/superpowers/pipeline-flow.md"
+  fi
+}
+
 install_user_bits() {
   # shellcheck source=teach-review.sh
   source "$KIT_ROOT/scripts/teach-review.sh"
@@ -343,6 +370,7 @@ install_user_bits() {
   chmod +x "$HOME/.cursor/statusline-loregate.sh"
   echo "copied: $HOME/.cursor/statusline-loregate.sh"
   echo "hint: enable Cursor CLI statusLine → command ~/.cursor/statusline-loregate.sh (see README)"
+  install_pipeline_canvas_user
 }
 
 install_project_bits() {
@@ -405,6 +433,8 @@ install_project_bits() {
   cp "$KIT_ROOT/scripts/pipeline-status.sh" "$PROJECT/scripts/pipeline-status.sh"
   chmod +x "$PROJECT/scripts/pipeline-status.sh"
   echo "copied: $PROJECT/scripts/pipeline-status.sh"
+  # Real HTML copy inside the consumer workspace (Cursor chat file links).
+  install_pipeline_canvas_into_project
   cp "$KIT_ROOT/scripts/pipeline-run-log.sh" "$PROJECT/scripts/pipeline-run-log.sh"
   chmod +x "$PROJECT/scripts/pipeline-run-log.sh"
   echo "copied: $PROJECT/scripts/pipeline-run-log.sh"

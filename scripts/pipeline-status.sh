@@ -449,11 +449,43 @@ print(json.dumps(rec, ensure_ascii=False))
 PY
 }
 
+# Resolve an absolute HTML path Cursor can open (workspace / ~/.cursor / kit).
+# Prefer consumer project copy so chat file links stay inside the agent workspace.
+# Chat markdown must use this bare path — never append ?query#hash (File not found).
+ps__resolve_canvas_file() {
+  local kit="$1"
+  local rel="docs/superpowers/pipeline-flow.html"
+  local cand resolved
+  for cand in \
+    "$PS_ROOT/$rel" \
+    "${HOME}/.cursor/pipeline-canvases/pipeline-flow.html" \
+    "$kit/$rel"
+  do
+    if [[ -e "$cand" ]]; then
+      # Prefer the workspace/consumer path as written (keep symlink path under PS_ROOT
+      # so Cursor opens a file inside the agent workspace, not only the kit realpath).
+      if [[ "$cand" == "$PS_ROOT/"* ]]; then
+        printf '%s\n' "$cand"
+        return 0
+      fi
+      resolved="$(python3 -c 'import os,sys; print(os.path.abspath(sys.argv[1]))' "$cand" 2>/dev/null || printf '%s' "$cand")"
+      printf '%s\n' "$resolved"
+      return 0
+    fi
+  done
+  printf '%s\n' "$kit/$rel"
+  return 0
+}
+
 ps__print_text() {
   local json="$1"
-  python3 - "$json" <<'PY'
+  local kit="$2"
+  local canvas_file
+  canvas_file="$(ps__resolve_canvas_file "$kit")"
+  python3 - "$json" "$canvas_file" <<'PY'
 import json, sys
 d = json.loads(sys.argv[1])
+canvas_file = sys.argv[2]
 route = d.get("route") or "unknown"
 layer = d.get("layer") or "idle"
 stage = d.get("stage") or "idle"
@@ -471,15 +503,10 @@ if legal:
 else:
     legal_s = "none — happy path only"
 canvas = d.get("canvas") or {}
-path = canvas.get("path") or "docs/superpowers/pipeline-flow.html"
 query = canvas.get("query") or ""
 hash_ = canvas.get("hash") or ""
-link = path
-if query:
-    link += "?" + query
-link += hash_
-
-# Machine/English skeleton — orchestrator adapts to the human's language.
+# Bare filesystem path only — Cursor chat treats ?query#hash as part of the
+# filename and fails with File not found. Highlight params go on the next line.
 print(f"Route: {route} · Layer: {layer} · Stage: {stage}")
 # Next stages hint from legal + stage family (kept short)
 next_map = {
@@ -496,7 +523,13 @@ next_map = {
 nxt = next_map.get(stage, "(see pipeline-flow)")
 print(f"Next: {nxt}")
 print(f"Legal returns: {legal_s}")
-print(f"Canvas: {link}")
+print(f"Canvas: {canvas_file}")
+highlight = ""
+if query:
+    highlight = "?" + query
+highlight += hash_
+if highlight:
+    print(f"Canvas highlight: {highlight}")
 tail = d.get("run_log_tail") or []
 if tail:
     import re
@@ -509,15 +542,17 @@ PY
 
 ps__print_canvas_url() {
   local json="$1" kit="$2"
-  python3 - "$json" "$kit" <<'PY'
-import json, sys, os
+  local canvas_file
+  canvas_file="$(ps__resolve_canvas_file "$kit")"
+  python3 - "$json" "$canvas_file" <<'PY'
+import json, sys
 d = json.loads(sys.argv[1])
-kit = sys.argv[2]
+canvas_file = sys.argv[2]
 canvas = d.get("canvas") or {}
-path = canvas.get("path") or "docs/superpowers/pipeline-flow.html"
 query = canvas.get("query") or ""
 hash_ = canvas.get("hash") or ""
-full = os.path.join(kit, path)
+# Browser / file URL with orientation params (not for Cursor markdown file links).
+full = canvas_file
 if query:
     full += "?" + query
 full += hash_
@@ -589,7 +624,7 @@ EOF
       ps__print_canvas_url "$record" "$kit_root"
       ;;
     text)
-      ps__print_text "$record"
+      ps__print_text "$record" "$kit_root"
       ;;
   esac
 }

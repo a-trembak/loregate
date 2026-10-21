@@ -36,9 +36,10 @@ At every closed-set human gate, skill `hitl-choice` prints a short **orientation
 
 | Surface | What it does |
 |---------|----------------|
-| Chat strip | Route · layer · stage · next stages · legal returns · canvas link |
+| Chat strip | Route · layer · stage · next stages · legal returns · **bare** canvas file path |
 | `/lgt-pipeline-status` | Same strip from disk markers + optional session ledger |
-| Canvas URL | `pipeline-flow.html?route=&layer=&stage=` (+ optional `#stage` hash) |
+| Canvas file (chat click) | Absolute path to `docs/superpowers/pipeline-flow.html` in the consumer project (copied by `lgt install`) — **no** `?` / `#` in the markdown link |
+| Canvas highlight / browser URL | `pipeline-flow.html?route=&layer=&stage=` (+ optional `#stage` hash) via `--canvas-url` or the strip’s `Canvas highlight:` line |
 
 **URL query parameters** (highlight on load; overview stays highlighted; hash opens a detail view and keeps the query so Back retains highlight):
 
