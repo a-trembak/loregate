@@ -351,6 +351,37 @@ install_pipeline_canvas_into_project() {
   fi
 }
 
+install_context_spend_status_extension() {
+  local ext_src ext_ver ext_dest
+  ext_src="$KIT_ROOT/extensions/context-spend-status"
+  if [[ ! -f "$ext_src/package.json" ]]; then
+    echo "warning: context-spend-status extension missing in kit; skipping copy" >&2
+    return 0
+  fi
+  ext_ver="$(python3 -c 'import json;print(json.load(open("'"$ext_src"'/package.json"))["version"])')"
+  ext_dest="$HOME/.cursor/extensions/loregate-context-spend-status-$ext_ver"
+
+  # Always recompile so git pull + lgt install does not leave stale out/.
+  if ! (cd "$ext_src" && npm install --no-fund --no-audit && npm run compile); then
+    echo "warning: context-spend-status compile failed; skipping extension copy (skill_missing: loregate-context-spend-status)" >&2
+    return 0
+  fi
+
+  if [[ ! -f "$ext_src/out/extension.js" ]]; then
+    echo "warning: context-spend-status out/extension.js still missing; skipping extension copy" >&2
+    return 0
+  fi
+
+  rm -rf "$ext_dest"
+  mkdir -p "$ext_dest"
+  cp "$ext_src/package.json" "$ext_dest/"
+  cp "$ext_src/README.md" "$ext_dest/" 2>/dev/null || true
+  cp -R "$ext_src/out" "$ext_dest/out"
+  echo "copied: $ext_dest"
+  echo "hint: Reload Window to enable Loregate Context Spend status bar (Agent Window / IDE)"
+}
+
+
 install_user_bits() {
   # shellcheck source=teach-review.sh
   source "$KIT_ROOT/scripts/teach-review.sh"
@@ -371,6 +402,7 @@ install_user_bits() {
   echo "copied: $HOME/.cursor/statusline-loregate.sh"
   echo "hint: enable Cursor CLI statusLine → command ~/.cursor/statusline-loregate.sh (see README)"
   install_pipeline_canvas_user
+  install_context_spend_status_extension
 }
 
 install_project_bits() {

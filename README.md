@@ -79,6 +79,7 @@ Two places: **Cursor user dir** (`~/.cursor`) and **the project**.
 | `~/.cursor/rules/pipeline-language-no-russian.mdc` | Copied / refreshed — sanctions policy: never use Russian in agent chat or language settings |
 | `~/.cursor/rules/code-via-coding-agents.mdc` | Copied / refreshed — parent chat must dispatch `csp-software-developer` / `csp-bug-fixer` for product code |
 | `~/.cursor/statusline-loregate.sh` | Copied / refreshed — optional Cursor Agent CLI two-line context-spend status (enable in `cli-config.json`; see below) |
+| `~/.cursor/extensions/loregate-context-spend-status-<version>/` | Copied / refreshed — IDE status bar context-spend proxies (Reload Window after install; see below) |
 | `~/.cursor/cursor-spells-kit-path` | Text file with absolute path to this kit checkout |
 | `~/.cursor/cursor-spells-learn.json` | Created if missing — `land` (`draft_merge` default / `auto_push`); never overwritten on update |
 | `~/.cursor/lgt-policy-accepted` | Written on every install/update after public policy agreement (`accepted_at`, `agree_via`, `policy_hash`, …) |
@@ -123,6 +124,14 @@ pipe  full·eng-review  +12pp/stage  peak:tech-spec(+28)  ⚠+18  hint:cut-clari
 | `short-docs` / `short-pr` | Trim docs or pull-request body bulk |
 
 Full behavior, snapshot rules, and stage mapping: [`docs/superpowers/specs/2026-10-21-cli-context-spend-statusline-design.md`](docs/superpowers/specs/2026-10-21-cli-context-spend-statusline-design.md). Manual checks: [`docs/superpowers/dogfood/cli-context-spend-statusline-checklist.md`](docs/superpowers/dogfood/cli-context-spend-statusline-checklist.md).
+
+### IDE context-spend status bar (Agent Window)
+
+Install copies the compiled extension from `extensions/context-spend-status/` to `~/.cursor/extensions/loregate-context-spend-status-<version>/` (package manifest, README, and `out/` only). **Reload Window** once after install or update so Cursor loads it.
+
+The status bar shows the same pipeline proxies as the CLI status line (`pipe …`, peak, ⚠ threshold) for Agent Window users. Click the item to open an Output channel with drill-down text.
+
+Design: [`docs/superpowers/specs/2026-10-21-ide-context-spend-statusbar-design.md`](docs/superpowers/specs/2026-10-21-ide-context-spend-statusbar-design.md). Manual checks: [`docs/superpowers/dogfood/ide-context-spend-statusbar-checklist.md`](docs/superpowers/dogfood/ide-context-spend-statusbar-checklist.md).
 
 Consumer projects may add `.cursor/gates/context-spend/` to `.gitignore` if they do not want debounced context snapshots in version control.
 

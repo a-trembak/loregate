@@ -1,0 +1,172 @@
+export type Snapshot = {
+  ts: string;
+  session_id: string;
+  ctx_pct: number;
+  stage: string;
+  route: string;
+  invocation_id?: string;
+};
+
+export type SpendMetrics = {
+  deltaStagePp: number | null;
+  peakStage: string | null;
+  peakPp: number | null;
+  alert: boolean;
+};
+
+type StageRun = {
+  stage: string;
+  firstCtx: number;
+  lastCtx: number;
+};
+
+export function loadSnapshots(jsonl: string): Snapshot[] {
+  const snapshots: Snapshot[] = [];
+
+  for (const line of jsonl.split(/\r?\n/)) {
+    if (line.trim() === "") {
+      continue;
+    }
+
+    try {
+      const value: unknown = JSON.parse(line);
+      if (isSnapshot(value)) {
+        snapshots.push(value);
+      }
+    } catch {
+      // Ignore a partial or malformed JSONL line.
+    }
+  }
+
+  return snapshots;
+}
+
+export function latestSessionSnapshots(
+  snapshots: Snapshot[],
+  nowMs = Date.now(),
+  maxAgeMs = 24 * 60 * 60 * 1000
+): Snapshot[] {
+  // Keep metrics bounded to the newest session seen within the last 24 hours.
+  const recentSnapshots = snapshots.filter((snapshot) => {
+    const timestamp = Date.parse(snapshot.ts);
+    return (
+      Number.isFinite(timestamp) &&
+      timestamp <= nowMs &&
+      timestamp >= nowMs - maxAgeMs
+    );
+  });
+  const latestSessionId = recentSnapshots.at(-1)?.session_id;
+
+  return latestSessionId === undefined
+    ? []
+    : recentSnapshots.filter(
+        (snapshot) => snapshot.session_id === latestSessionId
+      );
+}
+
+export function metricsForSession(
+  snapshots: Snapshot[],
+  sessionId: string,
+  currentStage: string,
+  currentCtx: number | null
+): SpendMetrics {
+  const sessionSnapshots = snapshots.filter(
+    (snapshot) => snapshot.session_id === sessionId
+  );
+
+  if (sessionSnapshots.length === 0) {
+    return emptyMetrics();
+  }
+
+  const latestSnapshot = sessionSnapshots.at(-1);
+  const runs = stageRuns(sessionSnapshots);
+  let peakStage: string | null = null;
+  let peakPp: number | null = null;
+
+  for (const run of runs) {
+    const delta = run.lastCtx - run.firstCtx;
+    if (delta > 0 && (peakPp === null || delta > peakPp)) {
+      peakStage = run.stage;
+      peakPp = delta;
+    }
+  }
+
+  if (currentCtx === null || latestSnapshot?.stage !== currentStage) {
+    return {
+      deltaStagePp: null,
+      peakStage,
+      peakPp,
+      alert: false,
+    };
+  }
+
+  const currentStageRun = latestRunForStage(runs, currentStage);
+  const deltaStagePp = currentStageRun
+    ? currentCtx - currentStageRun.firstCtx
+    : null;
+
+  return {
+    deltaStagePp,
+    peakStage,
+    peakPp,
+    alert: deltaStagePp !== null && deltaStagePp >= 15,
+  };
+}
+
+function isSnapshot(value: unknown): value is Snapshot {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.ts === "string" &&
+    typeof record.session_id === "string" &&
+    typeof record.ctx_pct === "number" &&
+    Number.isFinite(record.ctx_pct) &&
+    typeof record.stage === "string" &&
+    typeof record.route === "string" &&
+    (record.invocation_id === undefined ||
+      typeof record.invocation_id === "string")
+  );
+}
+
+function stageRuns(snapshots: Snapshot[]): StageRun[] {
+  const runs: StageRun[] = [];
+
+  for (const snapshot of snapshots) {
+    const current = runs.at(-1);
+    if (current?.stage === snapshot.stage) {
+      current.lastCtx = snapshot.ctx_pct;
+    } else {
+      runs.push({
+        stage: snapshot.stage,
+        firstCtx: snapshot.ctx_pct,
+        lastCtx: snapshot.ctx_pct,
+      });
+    }
+  }
+
+  return runs;
+}
+
+function latestRunForStage(
+  runs: StageRun[],
+  stage: string
+): StageRun | undefined {
+  for (let i = runs.length - 1; i >= 0; i -= 1) {
+    if (runs[i].stage === stage) {
+      return runs[i];
+    }
+  }
+  return undefined;
+}
+
+function emptyMetrics(): SpendMetrics {
+  return {
+    deltaStagePp: null,
+    peakStage: null,
+    peakPp: null,
+    alert: false,
+  };
+}
