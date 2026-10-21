@@ -13,6 +13,14 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "loregate.contextSpend.show",
+        "title": "Loregate: Show Context Spend"
+      }
+    ]
+  },
   "scripts": {
     "compile": "tsc -p .",
     "test": "npm run compile && node --test out/**/*.test.js"
