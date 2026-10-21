@@ -9,8 +9,20 @@ export STATUSLINE_LOREGATE_NOW_MS="${STATUSLINE_LOREGATE_NOW_MS:-}"
 exec 3<&0
 
 python3 - <<'PY'
-import json, os, sys, time
+import json, os, subprocess, sys, time
 from pathlib import Path
+from typing import Optional
+
+HINTS = [
+    (("tech-spec", "spec"), "thin-spec"),
+    (("plan", "approve-plan", "writing-plans"), "thin-plan"),
+    (("critic", "implementation-critic", "critique"), "compact-critic"),
+    (("build", "start-build", "software-developer", "csp-software-developer"), "slim-handoff"),
+    (("eng-review", "engineer-review", "review-gate", "clarify"), "cut-clarify"),
+    (("finish-plan", "local-diff"), "less-diff-paste"),
+    (("docs", "update-docs", "docs-gate"), "short-docs"),
+    (("create-pr", "finale"), "short-pr"),
+]
 
 def bar(pct: int, width: int = 10) -> str:
     pct = max(0, min(100, pct))
@@ -37,6 +49,65 @@ def load_snapshots(path: Path) -> list[dict]:
     except OSError:
         pass
     return rows
+
+def resolve_route_stage(root: Path) -> tuple[str, str, bool]:
+    """Return route, stage, and whether Loregate has active pipeline state."""
+    helper = root / "scripts" / "pipeline-status.sh"
+    if not helper.is_file():
+        return "unknown", "idle", False
+    try:
+        proc = subprocess.run(
+            ["bash", str(helper), "--json", "--root", str(root)],
+            capture_output=True,
+            text=True,
+            timeout=1.5,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return "unknown", "idle", False
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return "unknown", "idle", False
+    try:
+        data = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return "unknown", "idle", False
+    if not isinstance(data, dict):
+        return "unknown", "idle", False
+    route = str(data.get("route") or "unknown")
+    stage = str(data.get("stage") or "idle")
+    pending = data.get("pending_gates") or []
+    stages_entered = data.get("stages_entered") or []
+    has_pipeline = bool(pending) or bool(stages_entered) or (
+        route != "unknown" and stage != "idle"
+    )
+    return route, stage, has_pipeline
+
+def hint_for(stage: str) -> Optional[str]:
+    value = (stage or "").lower()
+    for keys, hint in HINTS:
+        if value in keys:
+            return hint
+    for keys, hint in HINTS:
+        for key in keys:
+            if value.startswith(key) or key in value:
+                return hint
+    return None
+
+def truncate_line(
+    line: str, width: int, protected: Optional[list[str]] = None
+) -> str:
+    if len(line) <= width:
+        return line
+    width = max(1, width)
+    suffix = "".join(protected or [])
+    if suffix and len(suffix) < width:
+        main = line[:-len(suffix)]
+        available = width - len(suffix) - 1
+        if available > 0:
+            return main[:available].rstrip() + "…" + suffix
+    if width == 1:
+        return "…"
+    return line[: width - 1].rstrip() + "…"
 
 def stage_metrics(rows: list[dict], ctx_pct: int, stage: str) -> tuple[int, str, int]:
     if not rows:
@@ -164,8 +235,14 @@ def main() -> int:
     model = ((payload.get("model") or {}).get("display_name")) or "?"
     cw = payload.get("context_window") or {}
     used = cw.get("used_percentage")
-    stage = os.environ.get("STATUSLINE_LOREGATE_STAGE") or "idle"
-    route = os.environ.get("STATUSLINE_LOREGATE_ROUTE") or "unknown"
+    stage_override = os.environ.get("STATUSLINE_LOREGATE_STAGE")
+    route_override = os.environ.get("STATUSLINE_LOREGATE_ROUTE")
+    if stage_override or route_override:
+        stage = stage_override or "idle"
+        route = route_override or "unknown"
+        has_pipeline = True
+    else:
+        route, stage, has_pipeline = resolve_route_stage(Path(root))
     delta_stage_pp = 0
     peak_stage = ""
     peak_pp = 0
@@ -175,22 +252,39 @@ def main() -> int:
         ctx_pct = float(used)
         pct = int(ctx_pct)
         line1 = f"cursor  {model}  ctx {pct}% {bar(pct)}  ring"
-        now_ms = int(os.environ.get("STATUSLINE_LOREGATE_NOW_MS") or time.time() * 1000)
-        delta_stage_pp, peak_stage, peak_pp = record_snapshot(
-            root=root,
-            session_id=str(payload.get("session_id") or ""),
-            ctx_pct=ctx_pct,
-            stage=stage,
-            route=route,
-            invocation_id=str(payload.get("invocation_id") or ""),
-            now_ms=now_ms,
-        )
+        if has_pipeline:
+            now_ms = int(os.environ.get("STATUSLINE_LOREGATE_NOW_MS") or time.time() * 1000)
+            delta_stage_pp, peak_stage, peak_pp = record_snapshot(
+                root=root,
+                session_id=str(payload.get("session_id") or ""),
+                ctx_pct=ctx_pct,
+                stage=stage,
+                route=route,
+                invocation_id=str(payload.get("invocation_id") or ""),
+                now_ms=now_ms,
+            )
 
-    line2 = f"pipe  {route}·{stage}  {delta_stage_pp:+d}pp/stage"
-    if peak_stage:
-        line2 += f"  peak:{peak_stage}(+{peak_pp})"
-    if delta_stage_pp >= 15:
-        line2 += f"  ⚠+{delta_stage_pp}"
+    try:
+        render_width = int(payload.get("render_width_chars") or 120)
+    except (TypeError, ValueError):
+        render_width = 120
+    protected = []
+    if not has_pipeline:
+        line2 = "pipe  —  (no loregate gates)"
+    else:
+        line2 = f"pipe  {route}·{stage}  {delta_stage_pp:+d}pp/stage"
+        if peak_stage:
+            line2 += f"  peak:{peak_stage}(+{peak_pp})"
+        if delta_stage_pp >= 15:
+            alert = f"  ⚠+{delta_stage_pp}"
+            line2 += alert
+            protected.append(alert)
+        hint = hint_for(stage)
+        if hint:
+            hint_suffix = f"  hint:{hint}"
+            line2 += hint_suffix
+            protected.append(hint_suffix)
+    line2 = truncate_line(line2, render_width, protected)
     print(line1)
     print(line2)
     return 0

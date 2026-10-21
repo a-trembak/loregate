@@ -26,6 +26,18 @@ assert_contains() {
   fi
 }
 
+assert_max_chars() {
+  local name="$1" value="$2" maximum="$3"
+  local length
+  length="$(python3 -c 'import sys; print(len(sys.argv[1]))' "$value")"
+  if (( length <= maximum )); then
+    echo "OK   $name"
+  else
+    echo "FAIL $name: length [$length] exceeds [$maximum] in [$value]" >&2
+    fail=1
+  fi
+}
+
 run_sl() {
   STATUSLINE_LOREGATE_ROOT="$1" "$SCRIPT" <<<"$2"
 }
@@ -83,9 +95,22 @@ out_peak="$(run_sl "$SPEND" "$p68")"
 assert_contains peak_tech "$out_peak" "peak:tech-spec(+18)"
 assert_contains alert_warn "$out_peak" "⚠+18"
 assert_contains delta_stage "$out_peak" "+18pp/stage"
+assert_contains hint_clarify_override "$out_peak" "hint:cut-clarify"
+
+p84_narrow='{"session_id":"sessA","cwd":"'"$SPEND"'","model":{"display_name":"Opus"},"context_window":{"used_percentage":84},"render_width_chars":48}'
+out_narrow="$(run_sl "$SPEND" "$p84_narrow")"
+line2_narrow="$(printf '%s\n' "$out_narrow" | sed -n '2p')"
+assert_max_chars narrow_line2_width "$line2_narrow" 48
+assert_contains narrow_keeps_alert "$line2_narrow" "⚠+16"
+assert_contains narrow_keeps_hint "$line2_narrow" "hint:cut-clarify"
+
+export STATUSLINE_LOREGATE_STAGE=finish-plan
+out_finish_hint="$(run_sl "$SPEND" "$PAYLOAD_NO_CTX")"
+assert_contains hint_finish_plan "$out_finish_hint" "hint:less-diff-paste"
 
 # Same stage, +0.5pp within debounce — no extra snapshot line required; line still renders
 export STATUSLINE_LOREGATE_NOW_MS=1005500
+export STATUSLINE_LOREGATE_STAGE=eng-review
 p68b='{"session_id":"sessA","cwd":"'"$SPEND"'","model":{"display_name":"Opus"},"context_window":{"used_percentage":68.5},"render_width_chars":120}'
 lines_before="$(wc -l <"$SPEND/.cursor/gates/context-spend/snapshots.jsonl" | tr -d ' ')"
 run_sl "$SPEND" "$p68b" >/dev/null
@@ -106,6 +131,27 @@ else
 fi
 
 unset STATUSLINE_LOREGATE_STAGE STATUSLINE_LOREGATE_ROUTE STATUSLINE_LOREGATE_NOW_MS
+
+# Resolve stage and route from the consumer helper when overrides are absent.
+FAKE="$TMP/fakepipe"
+mkdir -p "$FAKE/scripts" "$FAKE/.cursor/gates"
+cat >"$FAKE/scripts/pipeline-status.sh" <<'EOF'
+#!/usr/bin/env bash
+echo '{"route":"full","stage":"review-gate","pending_gates":[{"kind":"review-gate"}]}'
+EOF
+chmod +x "$FAKE/scripts/pipeline-status.sh"
+
+export STATUSLINE_LOREGATE_NOW_MS=3000000
+p55='{"session_id":"sFake","cwd":"'"$FAKE"'","model":{"display_name":"Opus"},"context_window":{"used_percentage":55},"render_width_chars":80}'
+out_f="$(run_sl "$FAKE" "$p55")"
+assert_contains resolved_stage "$out_f" "full·review-gate"
+assert_contains hint_clarify "$out_f" "hint:cut-clarify"
+
+EMPTY="$TMP/emptyproj"
+mkdir -p "$EMPTY"
+out_e="$(run_sl "$EMPTY" '{"session_id":"e1","cwd":"'"$EMPTY"'","model":{"display_name":"X"},"context_window":{"used_percentage":10},"render_width_chars":120}')"
+assert_contains no_gates "$out_e" "(no loregate gates)"
+unset STATUSLINE_LOREGATE_NOW_MS
 
 if [[ "$fail" -ne 0 ]]; then
   echo "FAILED" >&2
