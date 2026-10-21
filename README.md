@@ -78,12 +78,53 @@ Two places: **Cursor user dir** (`~/.cursor`) and **the project**.
 | `~/.cursor/rules/plain-language-chat.mdc` | Copied / refreshed — always-on full-words, full-sentence chat in the selected pipeline language (pipeline gate rules stay project-only) |
 | `~/.cursor/rules/pipeline-language-no-russian.mdc` | Copied / refreshed — sanctions policy: never use Russian in agent chat or language settings |
 | `~/.cursor/rules/code-via-coding-agents.mdc` | Copied / refreshed — parent chat must dispatch `csp-software-developer` / `csp-bug-fixer` for product code |
+| `~/.cursor/statusline-loregate.sh` | Copied / refreshed — optional Cursor Agent CLI two-line context-spend status (enable in `cli-config.json`; see below) |
 | `~/.cursor/cursor-spells-kit-path` | Text file with absolute path to this kit checkout |
 | `~/.cursor/cursor-spells-learn.json` | Created if missing — `land` (`draft_merge` default / `auto_push`); never overwritten on update |
 | `~/.cursor/lgt-policy-accepted` | Written on every install/update after public policy agreement (`accepted_at`, `agree_via`, `policy_hash`, …) |
 | mapped third-party skills (`npx skills add`) | Curated ids from [`skill-map.md`](skills/engineer-review/references/skill-map.md); skip with `--skip-third-party-skills` / `LGT_SKIP_THIRD_PARTY_SKILLS=1 (alias CSP_SKIP_THIRD_PARTY_SKILLS=1)`; `npx` failure is `skill_missing`, not a failed kit install |
 
 Directories `skills/`, `commands/`, `agents/` are created if missing. Existing **foreign** files/symlinks are never overwritten.
+
+### CLI context-spend status line (Cursor Agent CLI)
+
+Install copies `scripts/statusline-loregate.sh` to `~/.cursor/statusline-loregate.sh`. **Install does not edit** your CLI config — add this once to `~/.cursor/cli-config.json`:
+
+```json
+"statusLine": {
+  "type": "command",
+  "command": "~/.cursor/statusline-loregate.sh",
+  "updateIntervalMs": 500,
+  "timeoutMs": 2000,
+  "padding": 2
+}
+```
+
+Example render (proxies from the CLI context ring and on-disk pipeline gates — **not** API billing or token invoices):
+
+```text
+cursor  Opus  ctx 68% ███████░░░  ring
+pipe  full·eng-review  +12pp/stage  peak:tech-spec(+28)  ⚠+18  hint:cut-clarify
+```
+
+- **pp** — percentage points on the context ring scale (`50%` → `68%` is **+18pp**, not “+18% of 50”).
+- **peak:&lt;stage&gt;(+N)** — largest per-stage ring growth this session; use it to pick which pipeline stage to thin first.
+- **⚠+N** — same number as **+Npp/stage** when that per-stage delta is ≥ **15** (alert threshold; growth since this stage started in the session).
+- **hint:&lt;token&gt;** — fixed optimization lever for the **current** stage only (not for peak).
+
+| Hint token | Typical lever |
+|------------|----------------|
+| `thin-spec` | Shorter tech spec / acceptance criteria |
+| `thin-plan` | Smaller implementation plan |
+| `compact-critic` | Tighter critic prompts / returns |
+| `slim-handoff` | Less nested Task paste into parent chat |
+| `cut-clarify` | Shorter engineer-review clarify loops |
+| `less-diff-paste` | Smaller local-diff review payloads |
+| `short-docs` / `short-pr` | Trim docs or pull-request body bulk |
+
+Full behavior, snapshot rules, and stage mapping: [`docs/superpowers/specs/2026-10-21-cli-context-spend-statusline-design.md`](docs/superpowers/specs/2026-10-21-cli-context-spend-statusline-design.md). Manual checks: [`docs/superpowers/dogfood/cli-context-spend-statusline-checklist.md`](docs/superpowers/dogfood/cli-context-spend-statusline-checklist.md).
+
+Consumer projects may add `.cursor/gates/context-spend/` to `.gitignore` if they do not want debounced context snapshots in version control.
 
 #### B) `<project>/` (path argument, or auto-detected cwd repo / multi-repo workspace)
 

@@ -339,6 +339,10 @@ install_user_bits() {
   echo "copied: $HOME/.cursor/rules/pipeline-language-no-russian.mdc"
   cp "$KIT_ROOT/rules/code-via-coding-agents.mdc" "$HOME/.cursor/rules/code-via-coding-agents.mdc"
   echo "copied: $HOME/.cursor/rules/code-via-coding-agents.mdc"
+  cp "$KIT_ROOT/scripts/statusline-loregate.sh" "$HOME/.cursor/statusline-loregate.sh"
+  chmod +x "$HOME/.cursor/statusline-loregate.sh"
+  echo "copied: $HOME/.cursor/statusline-loregate.sh"
+  echo "hint: enable Cursor CLI statusLine → command ~/.cursor/statusline-loregate.sh (see README)"
 }
 
 install_project_bits() {
