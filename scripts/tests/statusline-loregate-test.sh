@@ -63,6 +63,50 @@ else
   fail=1
 fi
 
+# --- Snapshot / peak / alert (force stage via env for Task 2) ---
+# Implementation must honor STATUSLINE_LOREGATE_STAGE and STATUSLINE_LOREGATE_ROUTE when set (test hooks; Task 3 sets them from pipeline-status).
+
+SPEND="$TMP/spendproj"
+mkdir -p "$SPEND"
+export STATUSLINE_LOREGATE_STAGE=tech-spec
+export STATUSLINE_LOREGATE_ROUTE=full
+export STATUSLINE_LOREGATE_NOW_MS=1000000
+
+p50='{"session_id":"sessA","cwd":"'"$SPEND"'","model":{"display_name":"Opus"},"context_window":{"used_percentage":50},"render_width_chars":120}'
+run_sl "$SPEND" "$p50" >/dev/null
+assert_eq snap_exists "1" "$([[ -f "$SPEND/.cursor/gates/context-spend/snapshots.jsonl" ]] && echo 1 || echo 0)"
+
+export STATUSLINE_LOREGATE_NOW_MS=1005000
+export STATUSLINE_LOREGATE_STAGE=eng-review
+p68='{"session_id":"sessA","cwd":"'"$SPEND"'","model":{"display_name":"Opus"},"context_window":{"used_percentage":68},"render_width_chars":120}'
+out_peak="$(run_sl "$SPEND" "$p68")"
+assert_contains peak_tech "$out_peak" "peak:tech-spec(+18)"
+assert_contains alert_warn "$out_peak" "⚠+18"
+assert_contains delta_stage "$out_peak" "+18pp/stage"
+
+# Same stage, +0.5pp within debounce — no extra snapshot line required; line still renders
+export STATUSLINE_LOREGATE_NOW_MS=1005500
+p68b='{"session_id":"sessA","cwd":"'"$SPEND"'","model":{"display_name":"Opus"},"context_window":{"used_percentage":68.5},"render_width_chars":120}'
+lines_before="$(wc -l <"$SPEND/.cursor/gates/context-spend/snapshots.jsonl" | tr -d ' ')"
+run_sl "$SPEND" "$p68b" >/dev/null
+lines_after="$(wc -l <"$SPEND/.cursor/gates/context-spend/snapshots.jsonl" | tr -d ' ')"
+assert_eq debounce_no_write "$lines_before" "$lines_after"
+
+# New session resets peak attribution
+export STATUSLINE_LOREGATE_NOW_MS=2000000
+export STATUSLINE_LOREGATE_STAGE=plan
+p40='{"session_id":"sessB","cwd":"'"$SPEND"'","model":{"display_name":"Opus"},"context_window":{"used_percentage":40},"render_width_chars":120}'
+out_b="$(run_sl "$SPEND" "$p40")"
+# peak for sessB should not cite tech-spec(+18) from sessA
+if [[ "$out_b" == *'peak:tech-spec(+18)'* ]]; then
+  echo "FAIL session_isolation: peak leaked from sessA" >&2
+  fail=1
+else
+  echo "OK   session_isolation"
+fi
+
+unset STATUSLINE_LOREGATE_STAGE STATUSLINE_LOREGATE_ROUTE STATUSLINE_LOREGATE_NOW_MS
+
 if [[ "$fail" -ne 0 ]]; then
   echo "FAILED" >&2
   exit 1
