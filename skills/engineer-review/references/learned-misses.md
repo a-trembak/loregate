@@ -442,21 +442,24 @@ triggers:
   - "add test for" color | border | styling tweak
   - toHaveStyle | sx= | markArea | rgba( | Emotion snapshot | className string
   - React Testing Library | *.test.tsx | transformDataForCharts palette
+  - expect(CONST).toBe | minWidth | SEGMENT_MIN_WIDTH | gap | spacing token | Figma min-w
 phases: [logic, simplify]
 gate: T1
 rule_one_liner: >-
   Backend and frontend unit tests cover business decisions only; do not add
   or demand tests that only pin presentation constants (colors, borders,
-  fonts, sx, chart chrome) or cosmetic XML/snapshots.
+  fonts, sx, chart chrome, layout/DS tokens such as min-width/gap) or
+  cosmetic XML/snapshots — including after a clarify pixel choice.
 anti_pattern: >-
-  Writer adds fillColorIsF0F0F0 / thinBorder style XML tests, or frontend
+  Writer adds fillColorIsF0F0F0 / thinBorder style XML tests, frontend
   expects palette hex / toHaveStyle / Emotion snapshots after a visual-only
-  styling change; reviewer asks for more hex/border/sx coverage.
-hits: 2
-last_seen: 2026-09-22
+  styling change, or locks a layout token with expect(MIN_WIDTH).toBe(N)
+  after a DS/clarify pick; reviewer asks for more hex/border/sx/token coverage.
+hits: 3
+last_seen: 2026-10-21
 source: teach-review
 ```
 
-Mechanism: Excel and React styling fixes (lighter gray, borders, graph mask opacity, palette pad) invite hex-/stylesheet-/`sx`-pinning tests that churn on every design tweak and do not protect domain rules (when to gray a row or show an offline band, omit a column, treat online=0).
+Mechanism: Excel and React styling fixes (lighter gray, borders, graph mask opacity, palette pad, tab min-width) invite hex-/stylesheet-/`sx`-/token-pinning tests that churn on every design tweak and do not protect domain rules (when to gray a row or show an offline band, omit a column, treat online=0, which tabs are visible vs hidden). Clarify answers that pick a pixel value are product UI choices — verify visually, do not freeze them in Jest.
 
-Required check: [business-logic-tests-checklist.md](business-logic-tests-checklist.md) **T1** (explicitly includes React / Jest / Testing Library).
+Required check: [business-logic-tests-checklist.md](business-logic-tests-checklist.md) **T1** (explicitly includes React / Jest / Testing Library; writers load the same file via `software-developer`).
