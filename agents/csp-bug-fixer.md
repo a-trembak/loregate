@@ -47,6 +47,15 @@ You are the **bug-fixer** agent. You fix bugs at the root cause — nothing more
 - Comments: English only; `code-comments` Keep/Remove taxonomy (never delete `TODO`/`FIXME`). services forbid presentation (chart, screen, widget, Figma, user-interface link/example); React / frontend UI may reference the user interface.
 - Never implement on the default branch; never create branches in repos the plan does not touch.
 
-## Output
+## Output (parent return — keep short)
 
-Working tree changes for the fix on the feature branch(es), regression test coverage, verification evidence, `verifier_verdict`, the `repo → branch` map, `next_skill: csp-engineer-reviewer`, and handoff notes.
+Return to the parent chat a **compact handoff** (prefer under ~40 lines):
+
+- `status`: done / blocked
+- `repo → branch` map
+- Root-cause summary with **evidence pointers** (`file:line` or test name) — not full file dumps
+- `verifier_verdict`, verification evidence (command + pass/fail)
+- `next_skill: csp-engineer-reviewer`
+- Path to the fix plan if useful; `skill_missing` notes
+
+**Do not** paste full diffs, full logs, or whole source files into the parent chat.

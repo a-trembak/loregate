@@ -2,6 +2,8 @@
 # Contract checks: pipeline language marker, Russian ban, defaults.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 HELPER="$ROOT/scripts/lgt-pipeline-language.sh"
 fail=0
 
@@ -158,7 +160,7 @@ assert_grep doc_install "docs/superpowers/pipeline-language.md" "lgt install"
 assert_grep doc_mid_session "docs/superpowers/pipeline-language.md" "Mid-session switch"
 assert_grep skill_mid_session "skills/plain-language-chat/SKILL.md" "Mid-session switch"
 assert_grep rule_mid_session "rules/pipeline-language-no-russian.mdc" "mid-session"
-assert_grep start_skips_when_set "commands/lgt-start-task.md" "already set"
+assert_grep_start_task start_skips_when_set "already set"
 
 INST_PROJ="$TMP/inst-app"
 mkdir -p "$INST_PROJ"
@@ -199,7 +201,7 @@ fi
 
 # Wiring / docs presence
 assert_grep hitl_preset "skills/hitl-choice/references/presets.md" "### Pipeline language"
-assert_grep start_task "commands/lgt-start-task.md" "Pipeline language"
+assert_grep_start_task start_task "Pipeline language"
 assert_grep start_issue "commands/lgt-start-issue-task.md" "Pipeline language"
 assert_grep flow_doc "docs/superpowers/pipeline-flow.md" "lgt-pipeline-language|csp-pipeline-language"
 assert_grep readme "README.md" "lgt-pipeline-language|csp-pipeline-language"

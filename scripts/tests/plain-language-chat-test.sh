@@ -2,6 +2,8 @@
 # Contract checks: user-facing chat must use full words (no abbreviations).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_file() {
@@ -64,7 +66,7 @@ assert_grep humanizer_points_to_skill "skills/english-humanizer/SKILL.md" "plain
 assert_grep reviewer_loads_skill "agents/csp-engineer-reviewer.md" "plain-language-chat"
 assert_grep pr_reviewer_loads_skill "agents/csp-pr-reviewer.md" "plain-language-chat"
 assert_grep readme_lists_skill "README.md" "plain-language-chat"
-assert_grep start_task_asks_lang "commands/lgt-start-task.md" "Pipeline language"
+assert_grep_start_task start_task_asks_lang "Pipeline language"
 assert_grep start_issue_asks_lang "commands/lgt-start-issue-task.md" "Pipeline language"
 
 # Installer must drop the always-on rule into user-global and project rules.

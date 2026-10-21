@@ -2,6 +2,8 @@
 # Contract: product commits only after propose-commit + approve-commit.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_file() {
@@ -73,8 +75,8 @@ assert_grep docs_repo_no_commit "skills/update-docs/SKILL.md" "docs_repo.*uncomm
 
 assert_grep er_handoff "skills/engineer-review/SKILL.md" "propose-commit"
 assert_grep docs_residual "skills/update-docs/SKILL.md" "propose-commit"
-assert_grep start_full "commands/lgt-start-task.md" "propose-commit"
-assert_grep start_fast "commands/lgt-start-task.md" "propose-commit"
+assert_grep_start_task start_full "propose-commit"
+assert_grep_start_task start_fast "propose-commit"
 assert_grep start_issue "commands/lgt-start-issue-task.md" "propose-commit"
 
 assert_grep surface_uncommitted "skills/finish-plan/references/review-surface.md" "git status|git diff|uncommitted"

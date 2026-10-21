@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_grep() {
@@ -28,7 +30,7 @@ assert_grep fetch_case "skills/jira-fetch/SKILL.md" "fetch-failure-stops"
 assert_grep fetch_skip "skills/jira-fetch/SKILL.md" "skip score"
 assert_grep fetch_exact_input "skills/jira-fetch/SKILL.md" '--invocation "/lgt-start-task PROJ-1"'
 assert_not_grep fetch_no_live_input "skills/jira-fetch/SKILL.md" "(live|real) invocation string"
-assert_grep start_score "commands/lgt-start-task.md" "fetch-failure-stops"
+assert_grep_start_task start_score "fetch-failure-stops"
 assert_grep cpr_score "skills/create-pr/SKILL.md" "trajectory-cases.py score"
 assert_grep cpr_case "skills/create-pr/SKILL.md" "create-pr-draft-never-merge"
 assert_grep cpr_before_ready "skills/create-pr/SKILL.md" "before.*gh pr ready|before applying"
@@ -44,7 +46,7 @@ assert_grep cpr_merged_action "skills/create-pr/SKILL.md" 'merge-pull-request'
 assert_grep cpr_skip_review_like "skills/create-pr/SKILL.md" 'already Review-like.*skip score|skip score.*already Review-like'
 assert_grep cpr_skip_unknown_jira "skills/create-pr/SKILL.md" 'jira_status.*In Progress|skip score.*jira_status'
 assert_grep cpr_progress_only_when_scoring "skills/create-pr/SKILL.md" '--jira-status "In Progress".*only when scoring'
-assert_grep start_pass_status "commands/lgt-start-task.md" "jira_status"
+assert_grep_start_task start_pass_status "jira_status"
 assert_grep dogfood "docs/superpowers/dogfood/jira-ac-router-finale-checklist.md" "trajectory-wiring-test.sh"
 assert_grep readme "README.md" "fetch-failure-stops"
 assert_grep hitl_heading "skills/hitl-choice/references/presets.md" "### Trajectory fail"
@@ -71,12 +73,12 @@ assert_grep judge_not_developer "skills/trajectory-judge/SKILL.md" "csp-software
 assert_grep judge_re_score "skills/trajectory-judge/SKILL.md" "record action"
 assert_grep judge_agent "agents/csp-trajectory-judge.md" "csp-trajectory-judge"
 
-assert_grep route_unknown "commands/lgt-start-task.md" "route-unknown-asks-human"
-assert_grep route_feature "commands/lgt-start-task.md" "route-feature-to-full"
-assert_grep route_bug "commands/lgt-start-task.md" "route-bug-to-issue"
-assert_grep fast_bug "commands/lgt-start-task.md" "fast-bug-asks-human"
-assert_grep full_e2e "commands/lgt-start-task.md" "full-happy-path"
-assert_grep fast_e2e "commands/lgt-start-task.md" "fast-skips-plan-layer"
+assert_grep_start_task route_unknown "route-unknown-asks-human"
+assert_grep_start_task route_feature "route-feature-to-full"
+assert_grep_start_task route_bug "route-bug-to-issue"
+assert_grep_start_task fast_bug "fast-bug-asks-human"
+assert_grep_start_task full_e2e "full-happy-path"
+assert_grep_start_task fast_e2e "fast-skips-plan-layer"
 assert_grep story_stays "commands/lgt-start-issue-task.md" "start-issue-story-stays-issue"
 assert_grep issue_e2e "commands/lgt-start-issue-task.md" "issue-happy-path"
 assert_grep review_fixes "skills/finish-plan/SKILL.md" "review-gate-fixes-to-build"

@@ -2,6 +2,8 @@
 # Lightweight wiring contract for pipeline orientation surfaces.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_contains() {
@@ -26,8 +28,8 @@ assert_file() {
 
 assert_contains hitl_mentions_pipeline_status "$ROOT/skills/hitl-choice/SKILL.md" "pipeline-status"
 assert_file command_pipeline_status_exists "$ROOT/commands/lgt-pipeline-status.md"
-assert_contains start_task_orientation "$ROOT/commands/lgt-start-task.md" "/lgt-pipeline-status"
-assert_contains start_task_strip "$ROOT/commands/lgt-start-task.md" "orientation strip"
+assert_grep_start_task start_task_orientation "/lgt-pipeline-status"
+assert_grep_start_task start_task_strip "orientation strip"
 assert_file skill_pipeline_status_exists "$ROOT/skills/pipeline-status/SKILL.md"
 assert_file resolver_exists "$ROOT/scripts/pipeline-status.sh"
 

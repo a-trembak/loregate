@@ -4,6 +4,8 @@
 # is the bug this file guards.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_file() {
@@ -62,11 +64,17 @@ assert_grep verifier_verdicts "agents/csp-verifier.md" "verified"
 assert_grep bug_skill_verifier "skills/bug-fix/SKILL.md" "csp-verifier"
 assert_grep bug_agent_verifier "agents/csp-bug-fixer.md" "csp-verifier"
 
+# Nested Task returns must stay compact (no full artifact paste into parent).
+assert_grep tech_spec_short_return "agents/csp-tech-spec.md" "Do not.*paste the full tech-spec|parent return"
+assert_grep developer_short_return "agents/csp-software-developer.md" "Do not.*paste full diffs|compact handoff"
+assert_grep bug_fixer_short_return "agents/csp-bug-fixer.md" "Do not.*paste full diffs|compact handoff"
+assert_grep critic_short_return "agents/csp-implementation-critic.md" "Do not.*paste the full plan|parent return"
+
 # /lgt-start-task full: wait then finish-plan; fast: wait then engineer-reviewer.
-assert_grep start_task_wait "commands/lgt-start-task.md" "Wait for"
-assert_grep start_task_not_end "commands/lgt-start-task.md" "Do not treat dispatch as the end"
-assert_grep start_task_fast_wait "commands/lgt-start-task.md" "mode:fast"
-assert_grep start_task_fast_review "commands/lgt-start-task.md" "Wait for .*csp-software-developer|after .*returns"
+assert_grep_start_task start_task_wait "Wait for"
+assert_grep_start_task start_task_not_end "Do not treat dispatch as the end"
+assert_grep_start_task start_task_fast_wait "mode:fast"
+assert_grep_start_task start_task_fast_review "Wait for .*csp-software-developer|after .*returns"
 
 # /lgt-start-issue-task: wait for bug-fixer then engineer-reviewer.
 assert_grep issue_wait "commands/lgt-start-issue-task.md" "Wait for"
