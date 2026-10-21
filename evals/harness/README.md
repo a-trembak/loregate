@@ -76,3 +76,4 @@ Default history path (consumer project, gitignored with other gates): `.cursor/g
 - Code-quality evals: [`../code-quality/`](../code-quality/) (when present)
 - Dogfood: [`../../docs/superpowers/dogfood/harness-health-checklist.md`](../../docs/superpowers/dogfood/harness-health-checklist.md)
 - Security checklist contract (S1–S11 shared by reviewer + writers): `bash scripts/tests/security-hardening-checklist-test.sh`
+- Shared writer/reviewer JPA gates: `bash scripts/tests/shared-writer-reviewer-gates-test.sh`

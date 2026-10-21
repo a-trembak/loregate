@@ -60,7 +60,7 @@
 
 **Interfaces:** CLI exactly as tech-spec §3.
 
-- [ ] **Step 1: Write failing tests** covering at least:
+- [x] **Step 1: Write failing tests** covering at least:
   - `init` B does not clear A’s `inv-*.md`
   - `init` writes `current-invocation` pointer
   - re-`init` same id without `--reset` refuses; with `--reset` rewrites only that file
@@ -72,11 +72,11 @@
   - `--note` truncation at 120 **Unicode** characters (multi-byte fixture)
   - `brief-upsert` creates capped brief under `briefs/`
 
-- [ ] **Step 2: Implement helper until tests pass**
+- [x] **Step 2: Implement helper until tests pass**
 
-- [ ] **Step 3: Installer copy + gitignore recommendation print**
+- [x] **Step 3: Installer copy + gitignore recommendation print**
 
-- [ ] **Step 4: Run** `bash scripts/tests/pipeline-run-log-test.sh` — `ALL PASS`
+- [x] **Step 4: Run** `bash scripts/tests/pipeline-run-log-test.sh` — `ALL PASS`
 
 ---
 
@@ -91,10 +91,10 @@
 - Resolve: `--invocation` → pending-gate plan slug → `current-invocation` pointer → omit
 - Optional `Recent: <last note>`; missing journal never changes `stage` / `layer`
 
-- [ ] **Step 1: Extend status tests** (flag path, pointer path, omit, stage unchanged)
-- [ ] **Step 2: Implement enrichment**
-- [ ] **Step 3: Skill text**
-- [ ] **Step 4: Run status + run-log tests**
+- [x] **Step 1: Extend status tests** (flag path, pointer path, omit, stage unchanged)
+- [x] **Step 2: Implement enrichment**
+- [x] **Step 3: Skill text**
+- [x] **Step 4: Run status + run-log tests**
 
 ---
 
@@ -109,9 +109,9 @@
 - Fast / tiny / no formal plan: optional `brief-upsert`; **do not** require promote or invent `docs/**/plans` artifacts
 - Forbidden in notes/briefs: chat transcripts, full ticket bodies
 
-- [ ] **Step 1: Wiring greps** for helper name, `invocation_id`, `promote`, `brief-upsert`, allowlist paths
-- [ ] **Step 2: Edit spines**
-- [ ] **Step 3: Run wiring + helper + status tests**
+- [x] **Step 1: Wiring greps** for helper name, `invocation_id`, `promote`, `brief-upsert`, allowlist paths
+- [x] **Step 2: Edit spines**
+- [x] **Step 3: Run wiring + helper + status tests**
 
 ---
 
@@ -121,9 +121,9 @@
 - Modify: `docs/superpowers/pipeline-flow.md`, `README.md`
 - Create: `docs/superpowers/dogfood/pipeline-run-memory-checklist.md`
 
-- [ ] **Step 1: Document** consumer paths, pointer, brief, refuse-on-conflict, authority split, gitignore, no chat memory in kit
-- [ ] **Step 2: Dogfood** — two invocations; promote absent OK; promote conflict refuses; status via `--invocation` and pointer; fast path brief without plan; missing helper skip
-- [ ] **Step 3: Run full related suite** below
+- [x] **Step 1: Document** consumer paths, pointer, brief, refuse-on-conflict, authority split, gitignore, no chat memory in kit
+- [x] **Step 2: Dogfood** — two invocations; promote absent OK; promote conflict refuses; status via `--invocation` and pointer; fast path brief without plan; missing helper skip
+- [x] **Step 3: Run full related suite** below
 
 ---
 

@@ -145,10 +145,14 @@ assert_file "skills/engineer-review/references/learned-misses.md"
 assert_file "skills/engineer-review/references/jpa-repository-result-checklist.md"
 assert_grep phase_proto_jpa_result "skills/engineer-review/references/phase-protocol.md" \
   "jpa_result_type: matched\\|mismatched\\|skipped\\|n/a"
-assert_grep developer_jpa_patterns "skills/software-developer/SKILL.md" \
-  "jpa-repository-result-patterns\\.md"
+assert_grep developer_jpa_repo_checklist "skills/software-developer/SKILL.md" \
+  "jpa-repository-result-checklist\\.md"
+assert_grep developer_jpa_criteria_checklist "skills/software-developer/SKILL.md" \
+  "jpa-criteria-checklist\\.md"
 assert_grep bugfix_jpa_checklist "skills/bug-fix/SKILL.md" \
   "jpa-repository-result-checklist\\.md"
+assert_grep bugfix_jpa_criteria_checklist "skills/bug-fix/SKILL.md" \
+  "jpa-criteria-checklist\\.md"
 
 # Call-graph load routing: every listed phase agent must carry the canonical Follow
 # sentence so models load phase-protocol-detail (neighbors / call graph / graphify walk).

@@ -39,11 +39,11 @@ When triggered: **open the full checklist** `skills/engineer-review/references/f
 
 When triggered: **open the full checklist** `skills/engineer-review/references/business-logic-tests-checklist.md` and apply **T1**. Do not ask writers to pin presentation constants in backend **or** frontend unit tests.
 
-### JPA Criteria / Specification (J1–J2, N1, when triggered)
+### JPA Criteria / Specification (J1–J4, N1, when triggered)
 
-**Triggers (any):** diff touches `Specification`, Criteria `Subquery` / `exists(`, `fetch(` / `join(` on JPA entities, or follow-up null-safety in a file recently fixed for a query/runtime NPE.
+**Triggers (any):** diff touches `Specification`, Criteria `Subquery` / `exists(`, `fetch(` / `join(` on JPA entities, bag joins beside fetch, count-versus-entity query branches, or follow-up null-safety in a file recently fixed for a query/runtime NPE.
 
-When triggered: **open the full checklist** `skills/engineer-review/references/jpa-criteria-checklist.md` and apply matching **J1–J2** / **N1** gates.
+When triggered: **open the full checklist** `skills/engineer-review/references/jpa-criteria-checklist.md` and apply matching **J1–J4** / **N1** gates (same file writers load).
 
 ### JPA repository result type (RT1, when triggered)
 

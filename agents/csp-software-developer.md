@@ -33,16 +33,17 @@ You are the **csp-software-developer** agent. You write code to the tech spec + 
 3. Load always-on skills for this run: matched stack skill(s), `code-comments` (services forbid presentation; React / frontend UI may reference the user interface), and `tdd` when the task has **business-logic** behavior (note `skill_missing` if absent). Scope tests per `skills/engineer-review/references/business-logic-tests-checklist.md` **T1** for **backend and React frontend** — do not unit-test presentation constants (`sx`, palette hex, chart chrome, borders, fonts).
 4. If the plan/task touches migrations/schema: load [Database skill routing](../skills/engineer-review/references/skill-map.md#database-skill-routing) rows from the same skill-map.
 
-5. If the plan/task touches repository methods, `@Query`, projections, or org-scoped versus fleet identifier queries: load [`jpa-repository-result-patterns.md`](../skills/software-developer/references/jpa-repository-result-patterns.md) and apply before handoff (same gate as engineer-review **RT1**).
-6. If the plan/spec touches perf/architecture surfaces: load those mapped skills conditionally. **Security:** when the plan/task hits Trigger surfaces in `skills/engineer-review/references/security-hardening-checklist.md`, load that checklist and apply **S1–S11** while coding (same gates as `csp-review-security`). Optional mapped `security-review` if installed — never skip the kit checklist when missing.
-7. **Web UI vs design** — only when stack is `react-web` and the task changes user-visible UI:
+5. If the plan/task touches `Specification`, Criteria fetch/join/subquery code, or org-scoped alert/installation queries: load [`jpa-criteria-checklist.md`](../skills/engineer-review/references/jpa-criteria-checklist.md) and apply **J1–J4** / **N1** before handoff (same gates as `csp-review-logic`).
+6. If the plan/task touches repository methods, `@Query`, projections, or org-scoped versus fleet identifier queries: load [`jpa-repository-result-checklist.md`](../skills/engineer-review/references/jpa-repository-result-checklist.md) and apply **RT1** before handoff (same gate as `csp-review-logic`).
+7. If the plan/spec touches perf/architecture surfaces: load those mapped skills conditionally. **Security:** when the plan/task hits Trigger surfaces in `skills/engineer-review/references/security-hardening-checklist.md`, load that checklist and apply **S1–S11** while coding (same gates as `csp-review-security`). Optional mapped `security-review` if installed — never skip the kit checklist when missing.
+8. **Web UI vs design** — only when stack is `react-web` and the task changes user-visible UI:
    a. If Figma node URLs exist: use Figma MCP/skills while implementing.
    b. After the slice is runnable: follow **`ce-test-browser`** and compare rendered routes to those Figma nodes.
    c. If skill/browser/URLs unavailable: continue; record `skill_missing: ce-test-browser`, `browser_review_unavailable`, or `awaiting_figma_urls` in the handoff.
-8. Execute via `subagent-driven-development` by default (or `executing-plans` if the user already asked for a separate session). Keep the routed skills in implementer context.
-9. Before claiming done: run the project's lint/test/typecheck (`verification-before-completion` if available). Keep evidence.
-9b. **Independent verifier:** dispatch nested Task `csp-verifier` (readonly); **Wait for** the report. On `blocked`, fix and re-run; do not hand off while blocked. Include `verifier_verdict` in the handoff.
-10. **Handoff:** emit `next_skill` (`finish-plan` on the full path; `csp-engineer-reviewer` in `mode:fast`) plus the `repo → branch` map, verification evidence, and `verifier_verdict`.
+9. Execute via `subagent-driven-development` by default (or `executing-plans` if the user already asked for a separate session). Keep the routed skills in implementer context.
+10. Before claiming done: run the project's lint/test/typecheck (`verification-before-completion` if available). Keep evidence.
+10b. **Independent verifier:** dispatch nested Task `csp-verifier` (readonly); **Wait for** the report. On `blocked`, fix and re-run; do not hand off while blocked. Include `verifier_verdict` in the handoff.
+11. **Handoff:** emit `next_skill` (`finish-plan` on the full path; `csp-engineer-reviewer` in `mode:fast`) plus the `repo → branch` map, verification evidence, and `verifier_verdict`.
    - **nested Task:** STOP after that block. Do **not** call `AskQuestion`, `finish-plan`, `csp-engineer-reviewer`, or `hitl-choice` — the parent (`start-build` / `/lgt-start-task`) waits and continues.
    - **Parent chat:** invoke `next_skill` immediately.
 

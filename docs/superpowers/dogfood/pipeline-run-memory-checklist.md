@@ -6,6 +6,7 @@ Manual checks for consumer run-log journals, promote refuse-on-conflict, status 
 
 - Kit has `scripts/pipeline-run-log.sh` and `scripts/pipeline-status.sh`
 - Prefer a scratch temp root (do not pollute a real consumer unless intended)
+- If the agent sandbox blocks `mkdir .cursor`, export `PG_GATES_BASE="$ROOT/gates"` (and `mkdir -p` that path) before running helper commands — same override the contract tests use
 
 ## Steps
 

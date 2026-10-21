@@ -16,6 +16,7 @@ bash scripts/tests/clarify-question-evidence-test.sh    # clarify questions incl
 bash scripts/tests/pipeline-flow-graph-test.sh          # canvas layers + review-gate naming
 bash scripts/tests/review-surface-test.sh               # finish-plan surfaces diff before HITL; not create-pr
 bash scripts/tests/security-hardening-checklist-test.sh # S1–S11 shared by security phase + writers
+bash scripts/tests/shared-writer-reviewer-gates-test.sh # JPA / Criteria checklists shared by logic phase + writers
 bash scripts/tests/engineer-review-context-budget-test.sh  # orch must not load checklist bodies; security opens full S1–S11
 ```
 

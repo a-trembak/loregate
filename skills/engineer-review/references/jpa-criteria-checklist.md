@@ -51,3 +51,36 @@ Do **not** hardcode product names or ticket ids. Apply the rule; examples are il
 **Anti-pattern:** merging null-safe mapping while silently reverting a Criteria correlation line that fixed the original 500.
 
 **Shared callers:** when null guards are added in service A, scan other callers of the same repository/spec/Feign helper (search, dashboard list, occurrences) for the same null shape — do not treat one endpoint as done if siblings share the unfixed path.
+
+---
+
+## J3 — Do not mix fetch with a bag collection join on the same root
+
+**Trigger:** the diff adds or changes a Criteria / `Specification` that uses `fetch()` and also `join()` on the same root.
+
+**Required check:**
+
+1. Never combine `fetch()` on one association with a regular `join()` on a `@OneToMany` / `@ManyToMany` **bag** on the same root for filtering.
+2. Prefer `EXISTS` (or a separate query) for collection membership filters instead of a bag join alongside fetch.
+
+**Anti-pattern:** fetch-joining a single-valued association while joining a bag collection on the same root to filter membership.
+
+---
+
+## J4 — Count queries must not fetch; entity page queries may
+
+**Trigger:** the same `Specification` lambda serves both entity page queries and count queries (`query.getResultType()`).
+
+**Required check:**
+
+1. **Entity page queries** (`query.getResultType()` equals the entity class): may use `fetch` for the association predicates.
+2. **Count queries**: use `join`, never `fetch`, for the same association predicates.
+3. Share predicate logic; branch only on fetch versus join.
+
+**Anti-pattern:** applying `fetch` on the count path (or duplicating divergent predicate trees instead of branching on result type).
+
+---
+
+## Writer note
+
+`csp-software-developer` and `csp-bug-fixer` load **this same file** when implementing or fixing Criteria / `Specification` code. Apply J1–J4 and N1 while coding — do not maintain a parallel patterns doc.

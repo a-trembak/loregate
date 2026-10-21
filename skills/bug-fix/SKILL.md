@@ -45,7 +45,8 @@ Load when available; note `skill_missing: <id>` and continue on built-in discipl
 | [`skill-map.md`](../engineer-review/references/skill-map.md) stack (+ DB rows if migrations) | Same mechanical lookup as `csp-software-developer` |
 | [security-hardening-checklist.md](../engineer-review/references/security-hardening-checklist.md) (**S1–S11**) | Load when the fix touches Trigger surfaces (auth, queries, uploads, secrets, SSRF/XSS sinks, etc.) — same gates as `csp-review-security`; optional `security-review` enrichment only |
 
-| [jpa-repository-result-checklist.md](../engineer-review/references/jpa-repository-result-checklist.md) (**RT1**) | Load when the defect is result-type mismatch (`result type did not match Query selection type`, `multiple selections: use Tuple or array`) or the fix touches repository methods, `@Query`, projections, or org-scoped versus fleet identifier queries |
+| [jpa-repository-result-checklist.md](../engineer-review/references/jpa-repository-result-checklist.md) (**RT1**) | Load when the defect is result-type mismatch (`result type did not match Query selection type`, `multiple selections: use Tuple or array`) or the fix touches repository methods, `@Query`, projections, or org-scoped versus fleet identifier queries — same file as `csp-review-logic` / `csp-software-developer` |
+| [jpa-criteria-checklist.md](../engineer-review/references/jpa-criteria-checklist.md) (**J1–J4**, **N1**) | Load when the fix touches `Specification`, Criteria fetch/join/subquery, bag joins, or count-versus-entity query branches — same file as `csp-review-logic` / `csp-software-developer` |
 | `tdd` / project test conventions | Failing test that proves the bug **before** the fix |
 | **`graphify-pipeline`** | After root cause: caller/callee queries; after verify: `refresh` per [stages.md](../graphify-pipeline/references/stages.md) |
 
