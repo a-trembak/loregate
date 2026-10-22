@@ -56,7 +56,7 @@ Reliable handoff into the engineer-review HITL gate. Prefer this over hoping a g
      - `figma_clarifications` only if Figma URLs were already collected in this flow
      The supervisor owns Figma clarification collection when none were already collected.
    - If changed repo count is **1**, keep the existing single-repo path unchanged:
-     - If frontend stack (`react-web` / `react-native`): also ask Figma via skill **`hitl-choice`** preset **Figma ask** (or text: paste links / `no figma`).
+     - If frontend stack (`react-web` / `react-native`): if Figma Model Context Protocol tools are missing from the session, ask **Enable Figma MCP** first; then ask Figma via skill **`hitl-choice`** preset **Figma ask** (or text: paste links / `no figma`).
      - Then run skill `engineer-review` / agent `csp-engineer-reviewer` for the changed repo (pass Figma URLs in clarifications if provided).
 
 ## Notes

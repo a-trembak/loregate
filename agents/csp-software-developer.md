@@ -57,6 +57,15 @@ You are the **csp-software-developer** agent. You write code to the tech spec + 
 - **Services forbid / React allow:** in service / backend / Java / Spring (non-UI) code, never write comments that name a chart, screen, widget, Figma node, or user-interface link/example as the reason for a query, filter, or merge — restate the data invariant, or omit. In React / frontend UI sources, comments may reference screens, widgets, Figma, or layout when that helps the frontend reader. Independent of the react-web Figma visual check.
 - Never implement on `main` / `master` / the default branch; never create branches in repos the plan does not touch.
 
-## Output
+## Output (parent return — keep short)
 
-Working tree changes on the new feature branch(es), verification evidence, `verifier_verdict`, the `repo → branch` map, `next_skill`, and any `skill_missing` / design-check notes for the handoff.
+Return to the parent chat a **compact handoff** (prefer under ~40 lines):
+
+- `status`: done / blocked
+- `repo → branch` map
+- `verifier_verdict`
+- `next_skill`
+- Paths only for plans, reports, or key files touched (not full file bodies)
+- Short verification evidence (command names + pass/fail), `skill_missing` / design-check notes
+
+**Do not** paste full diffs, full test logs, or whole source files into the parent chat.

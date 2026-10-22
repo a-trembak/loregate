@@ -2,6 +2,8 @@
 # Wiring contract: allowlisted dual-write surfaces mention pipeline-run-log.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_grep() {
@@ -33,6 +35,8 @@ assert_grep installer_gitignore "scripts/install-to-project.sh" "run-log/"
 
 ALLOWLIST=(
   "commands/lgt-start-task.md"
+  "commands/references/lgt-start-task-full.md"
+  "commands/references/lgt-start-task-fast.md"
   "commands/lgt-start-issue-task.md"
   "skills/tech-spec/SKILL.md"
   "skills/approve-plan/SKILL.md"
@@ -51,9 +55,9 @@ for path in "${ALLOWLIST[@]}"; do
 done
 
 # Bootstrap mint + init + promote + brief on start commands
-assert_grep start_task_init "commands/lgt-start-task.md" "pipeline-run-log\\.sh init|run-log.*init"
-assert_grep start_task_promote "commands/lgt-start-task.md" "promote"
-assert_grep start_task_brief "commands/lgt-start-task.md" "brief-upsert"
+assert_grep_start_task start_task_init "pipeline-run-log\\.sh init|run-log.*init"
+assert_grep_start_task start_task_promote "promote"
+assert_grep_start_task start_task_brief "brief-upsert"
 assert_grep start_issue_init "commands/lgt-start-issue-task.md" "pipeline-run-log\\.sh init|run-log.*init"
 assert_grep start_issue_promote "commands/lgt-start-issue-task.md" "promote"
 
@@ -66,7 +70,7 @@ assert_grep hitl_append "skills/hitl-choice/SKILL.md" "append"
 assert_grep hitl_status_inv "skills/hitl-choice/SKILL.md" "--invocation|invocation"
 
 # Forbidden content guidance somewhere in allowlist or docs-facing spines
-assert_grep start_no_chat_dump "commands/lgt-start-task.md" "chat transcript|ticket bod"
+assert_grep_start_task start_no_chat_dump "chat transcript|ticket bod"
 
 if [[ "$fail" -ne 0 ]]; then
   echo "SOME TESTS FAILED" >&2

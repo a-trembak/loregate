@@ -5,6 +5,8 @@
 # pipeline end. After skip/approve/done, engineer-review continues.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_file() {
@@ -94,8 +96,8 @@ assert_grep rule_surface "rules/after-plan-review-gate.mdc" "review-surface|SetA
 assert_grep rule_local_diff "rules/after-plan-review-gate.mdc" "local-diff-review|Local Diff Review"
 assert_grep hook_surface "hooks/post-plan-review-gate.sh" "review-surface|SetActiveBranch"
 assert_grep hook_local_diff "hooks/post-plan-review-gate.sh" "review-local-diff|local-diff-review"
-assert_grep start_task_surface "commands/lgt-start-task.md" "review-surface|SetActiveBranch"
-assert_grep start_task_local_diff "commands/lgt-start-task.md" "local-diff-review|review-local-diff"
+assert_grep_start_task start_task_surface "review-surface|SetActiveBranch"
+assert_grep_start_task start_task_local_diff "local-diff-review|review-local-diff"
 assert_grep hitl_local_diff "skills/hitl-choice/references/presets.md" "local-diff-review|Current thread"
 assert_grep readme_surface "README.md" "review-surface|SetActiveBranch"
 assert_grep readme_local_diff "README.md" "Local Diff Review|review-local-diff|local-diff-review"

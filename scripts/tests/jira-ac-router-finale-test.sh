@@ -2,6 +2,8 @@
 # Contract checks for Jira fetch / router / Pipeline finale / capture-escape.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_file() {
@@ -52,9 +54,9 @@ assert_grep token_ready "skills/hitl-choice/references/presets.md" '`ready`'
 assert_grep token_keep_draft_jira "skills/hitl-choice/references/presets.md" '`keep_draft_jira`'
 assert_grep token_ready_jira "skills/hitl-choice/references/presets.md" '`ready_jira`'
 
-assert_grep start_task_fetch "commands/lgt-start-task.md" "jira-fetch"
-assert_grep start_task_never_auto_fast "commands/lgt-start-task.md" "never auto-select"
-assert_grep start_task_bug_route "commands/lgt-start-task.md" "jira_class.*bug"
+assert_grep_start_task start_task_fetch "jira-fetch"
+assert_grep_start_task start_task_never_auto_fast "never auto-select"
+assert_grep_start_task start_task_bug_route "jira_class.*bug"
 assert_grep start_issue_reuse "commands/lgt-start-issue-task.md" "do not re-fetch|already-fetched"
 assert_grep write_spec_fetch "commands/lgt-write-tech-spec.md" "jira-fetch"
 assert_grep create_pr_draft_first "skills/create-pr/SKILL.md" "Draft first"
@@ -72,8 +74,8 @@ assert_grep create_pr_resume "skills/create-pr/SKILL.md" "Resume after merge or 
 assert_grep create_pr_closed "skills/create-pr/SKILL.md" "closed_unmerged"
 assert_grep create_pr_never_merge "skills/create-pr/SKILL.md" "Never merge"
 assert_no_grep create_pr_no_ready_column "skills/create-pr/SKILL.md" "while the GitHub PR is ready for review"
-assert_grep start_task_in_progress "commands/lgt-start-task.md" "jira-transition"
-assert_grep start_task_in_progress_target "commands/lgt-start-task.md" "in_progress"
+assert_grep_start_task start_task_in_progress "jira-transition"
+assert_grep_start_task start_task_in_progress_target "in_progress"
 assert_grep start_issue_in_progress "commands/lgt-start-issue-task.md" "jira-transition"
 assert_grep hitl_ready_review "skills/hitl-choice/references/presets.md" "jira-transition"
 assert_grep hitl_review_after_merge "skills/hitl-choice/references/presets.md" "all_merged_ci_success"

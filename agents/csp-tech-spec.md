@@ -37,6 +37,12 @@ You are the **csp-tech-spec** agent. You produce a developer's technical action 
 - Source-code identifiers and comments in any code/schema examples inside the spec: English only.
 - On every draft and especially on `revise`, follow skill `clean-decision-docs`: rewrite the spec as current truth only. No "fixed/changed to/was previously", no What-changed section, no strikethrough of old draft text inside the file. Summarize the turn's edits in chat if the human needs to verify.
 
-## Output
+## Output (parent return — keep short)
 
-The tech-spec file itself, plus a HITL ask (`hitl-choice` (AskQuestion required)) pointing to its path for `approve-spec` / `revise` / `skip <reason>`.
+Return to the parent chat **only**:
+
+1. One-line status (`draft` / `approved` / `skip` / blocked reason).
+2. Absolute or repo-relative **path** to the tech-spec file (and system-design file if any).
+3. The `hitl-choice` ask for `approve-spec` / `revise` / `skip <reason>` when needed.
+
+**Do not** paste the full tech-spec or system-design body back into the parent chat. The parent opens the path when it needs content.

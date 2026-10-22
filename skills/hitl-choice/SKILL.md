@@ -8,7 +8,8 @@ description: >-
   start-issue-task blocked critic, blocked implementation-critic gates,
   pipeline route / Fast vs issue, Pipeline language, create-pr Pipeline finale,
   Teach-review miss, Local Diff Review gate (`approve-diff` / `comment`),
-  approve-commit, and Capture-escape destination.
+  approve-commit, Capture-escape destination, and Enable Figma MCP when
+  Figma tools are missing from the session.
 ---
 
 # HITL Choice
@@ -17,7 +18,7 @@ Canonical UX for closed-set HITL questions. **Always attempt interactive buttons
 
 ## When to Use
 
-  - Any kit HITL gate with a fixed option set (`approve-plan` / `revise`, `skip` / `approve` / `done`, `docs_md` / `docs_repo` / `confluence`, **MCP skills update** (`mcp_skills` / `skip_mcp_skills`), `human` / `agent`, `light` / `full`, Decision-tier forks, blocked-critic next steps, **engineer-review / pr-review Needs clarification**, **force-clear / leave** for a foreign pipeline gate, **Review-learn promote**, **Teach-review miss** (`miss` / `project_secret` / `no_miss`), **Capture-escape destination** (`miss` / `project_secret`), **Pipeline language**, **Pipeline route**, **Fast vs issue**, **Local Diff Review gate** (`approve-diff` / `comment`), **Propose commit** (`approve-commit` / `revise`), **Pipeline finale`)
+  - Any kit HITL gate with a fixed option set (`approve-plan` / `revise`, `skip` / `approve` / `done`, `docs_md` / `docs_repo` / `confluence`, **MCP skills update** (`mcp_skills` / `skip_mcp_skills`), `human` / `agent`, `light` / `full`, Decision-tier forks, blocked-critic next steps, **engineer-review / pr-review Needs clarification**, **force-clear / leave** for a foreign pipeline gate, **Review-learn promote**, **Teach-review miss** (`miss` / `project_secret` / `no_miss`), **Capture-escape destination** (`miss` / `project_secret`), **Pipeline language**, **Pipeline route**, **Fast vs issue**, **Local Diff Review gate** (`approve-diff` / `comment`), **Propose commit** (`approve-commit` / `revise`), **Pipeline finale**, **Enable Figma MCP** (`figma_enabled` / `skip_figma_mcp`))
 - Not for open-ended answers alone (Figma URL paste, docs-repo path, Confluence space/URL, long revise notes, free-form clarification replies after `Ci:other`, missing Jira paste, typed language code after Pipeline language `other`) — those stay chat text after the closed choice, if any
 
 ## Protocol (mandatory)
@@ -43,6 +44,7 @@ Canonical UX for closed-set HITL questions. **Always attempt interactive buttons
    - `fixes` (finish-plan) → wait for the fix description, implement/fix, re-ask the gate
    - `comment` (Local Diff Review gate) → follow skill `local-diff-review-gate` / plugin `review-local-diff` in this thread; wait for outbound Send or pasted JSON
    - `have_urls` (Figma) → wait for pasted node URLs
+   - `figma_enabled` (Enable Figma MCP) → human toggles Customize → MCPs → figma, then continue; re-check tools once
    - `docs_repo` → wait for docs repo path or clone URL (optional branch / folder)
    - `confluence` → wait for space/parent or page URL
    - `accept F<id>` may be chosen via buttons; extra notes stay optional chat text

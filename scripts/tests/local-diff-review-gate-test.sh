@@ -2,6 +2,8 @@
 # Contract: pipeline local-diff-review-gate before propose-commit.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=lib-assert.sh
+source "$(dirname "$0")/lib-assert.sh"
 fail=0
 
 assert_file() {
@@ -68,8 +70,8 @@ assert_grep hitl_approve_diff "skills/hitl-choice/references/presets.md" "approv
 assert_grep hitl_comment_token "skills/hitl-choice/references/presets.md" "Open Local Diff Review canvas"
 assert_grep rule_tokens "rules/hitl-askquestion.mdc" "approve-diff"
 
-assert_grep start_full "commands/lgt-start-task.md" "local-diff-review-gate"
-assert_grep start_fast "commands/lgt-start-task.md" "local-diff-review-gate"
+assert_grep_start_task start_full "local-diff-review-gate"
+assert_grep_start_task start_fast "local-diff-review-gate"
 assert_grep start_issue "commands/lgt-start-issue-task.md" "local-diff-review-gate"
 assert_grep propose_when "skills/propose-commit/SKILL.md" "local-diff-review-gate"
 assert_grep propose_precondition "skills/propose-commit/SKILL.md" "Local Diff Review gate settled|precondition 5|invoke skill \`local-diff-review-gate\` first"
