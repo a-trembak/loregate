@@ -82,15 +82,23 @@ Ask only after the human chose `agent` on Tech-spec entry. Do not ask in `human`
 | `no_figma` | No Figma |
 | `have_urls` | I will paste Figma node URLs |
 
-On `no_figma`, treat as typed `no figma`. On `have_urls`, wait for pasted URLs before `csp-review-figma-markup`.
+On `no_figma`, treat as typed `no figma`. On `have_urls`, wait for pasted URLs; **as soon as URLs are in chat**, run the **Enable Figma MCP** check below before any Figma tool call or `csp-review-figma-markup`.
 
 If the session has **no Figma Model Context Protocol tools** (server disabled or missing from the catalog) and the task still needs Figma, ask **Enable Figma MCP** **before** this gate (or before loading `figma-use` / `csp-review-figma-markup`).
 
 ### Enable Figma MCP
 
-Ask only when Figma work is in scope (frontend implement or review with design URLs / about to ask **Figma ask**) **and** the live tool catalog has no usable Figma Model Context Protocol namespace (disabled, absent, or zero tools). This is **not** OAuth `mcp_auth` — Cursor has no Enable button in chat; the human toggles **Customize → MCPs → figma**.
+**Mandatory** whenever **any** of these is true **and** Figma Model Context Protocol tools are unusable in this session:
 
-Prompt must say in full words: open Customize, open Model Context Protocol, turn **figma** on, then choose Continue.
+1. The human pasted Figma URLs / node links in chat (including after `have_urls`, or unsolicited paste mid-pipeline).
+2. Clarifications / acceptance criteria / ticket / plan already contain Figma URLs and the agent is about to use them.
+3. About to ask **Figma ask**, or about to load `figma-use` / `figma-design-to-code` / dispatch `csp-review-figma-markup`.
+
+**How to detect “unusable” (do this every time before Figma work):** inspect the live tool catalog / dynamic namespaces for a Figma Model Context Protocol server (names like `plugin-figma-figma` / `figma`). Treat as unusable when the namespace is absent, disabled, `needsAuth` without usable tools, error, or exposes zero design tools. Prefer a quick `GetDynamicTools` / catalog probe over guessing.
+
+This is **not** OAuth `mcp_auth` — Cursor has no Enable button in chat; the human toggles **Customize → MCPs → figma**.
+
+Prompt must say in full words: open Customize, open Model Context Protocol, turn **figma** on, then choose Continue. Do **not** silently continue after a paste when tools are missing.
 
 | id | label |
 |----|-------|
@@ -99,7 +107,7 @@ Prompt must say in full words: open Customize, open Model Context Protocol, turn
 
 On `figma_enabled`: re-check the tool catalog once. If Figma tools are still missing, re-ask this gate once (same tokens); after a second miss, note `skill_missing: figma-mcp` / `figma_mcp: unavailable` and continue without inventing pixel diffs. On `skip_figma_mcp`: continue without Figma Model Context Protocol; treat markup compare as skipped / source-only as the caller already documents; do not invent design evidence.
 
-Do not ask this gate when Figma tools are already available, or when the human already chose `no_figma` / `no figma`.
+Do not ask this gate when Figma tools are already available, or when the human already chose `no_figma` / `no figma` / `skip_figma_mcp` earlier in this run.
 
 ### Docs update destination
 

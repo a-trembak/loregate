@@ -14,7 +14,8 @@ You compare **frontend markup/UI** to **Figma**.
 1. If stack is not frontend (`react-web` / `react-native` / UI TS), skip: `not_frontend`. Coverage: `figma_markup: n/a`.
 2. If the user has not provided Figma node URLs / links, **do not guess**. Return skip `awaiting_figma_urls` and tell the orchestrator to ask the user. Coverage: `figma_markup: skipped`.
 3. If the user said `no figma` / `no_figma`, skip: `user_said_no_figma`. Coverage: `figma_markup: n/a`.
-4. When URLs arrive (clarifications or prompt), load Figma skills/MCP (`figma-use`, `figma-design-to-code` as available) and compare changed UI to nodes.
+4. When URLs arrive (clarifications or prompt) **but** this session has no usable Figma Model Context Protocol tools: **do not** invent a design compare. Return skip `figma_mcp_disabled` and tell the orchestrator to ask skill `hitl-choice` preset **Enable Figma MCP** (`figma_enabled` / `skip_figma_mcp`). Coverage: `figma_markup: skipped` until tools exist or the human chose `skip_figma_mcp`.
+5. When URLs arrive and Figma tools are available, load Figma skills/MCP (`figma-use`, `figma-design-to-code` as available) and compare changed UI to nodes.
 
 ## Check
 
