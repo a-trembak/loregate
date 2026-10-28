@@ -2,7 +2,7 @@
 
 ## Status
 
-`draft` — awaiting human review of this file before an implementation plan.
+`approved` — human reviewed; implementation plan `docs/superpowers/plans/2026-10-28-engineer-review-before-local-diff.md`.
 
 ## Goal
 
