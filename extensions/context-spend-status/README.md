@@ -1,21 +1,34 @@
-# Loregate Context Spend
+# Loregate Pipeline Status
 
-This Cursor extension shows the active Loregate pipeline stage and its context
-spend in the status bar.
+Cursor extension for Loregate: a **Pipeline Map** Webview (green / here / waiting / blocked) plus an optional context-spend status chip when the system status bar is visible.
 
 ## Install
 
 Run `lgt install` or `lgt update` from the Loregate kit. The installer compiles
-the extension and copies it into `~/.cursor/extensions`.
+this extension and copies it into `~/.cursor/extensions`.
 
 After installation, run **Developer: Reload Window** in Cursor.
 
-## Status item
+## Primary: Pipeline Map (Agent Window friendly)
 
-The status item shows the current route and pipeline stage. It adds a warning
-when the current stage has consumed at least 15 context percentage points.
-Select the item to open details, including the largest stage increase and a
-stage-specific hint.
+1. Open the Command Palette.
+2. Run **Loregate: Show Pipeline Map**.
 
-Snapshots older than 24 hours are ignored, and metrics use only the latest
-session recorded in the snapshot file.
+This opens an editor Webview that polls `pipeline-status.sh --json` about every
+three seconds. No agent tokens are used for refresh.
+
+If the Activity Bar / Primary Side Bar is visible, a **Loregate** icon may also
+appear; it shows the same map. The command works even when that icon is hidden.
+
+## Status chip (optional)
+
+When Cursor’s system status bar is visible, a `pipe …` chip may appear there.
+Select it to open the Pipeline Map. If the system status bar is missing (known
+Cursor layout bugs), rely on **Loregate: Show Pipeline Map** instead.
+
+## Data
+
+- Orientation: `scripts/pipeline-status.sh --json`
+- Context-spend snapshots (optional): `.cursor/gates/context-spend/snapshots.jsonl`
+
+Prefer a workspace folder that contains `.cursor/gates`.

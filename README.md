@@ -81,7 +81,7 @@ Two places: **Cursor user dir** (`~/.cursor`) and **the project**.
 | `~/.cursor/rules/ui-explanations-human-language.mdc` | Copied / refreshed — UI bugs and screen choices name what the human sees, not component props |
 | `~/.cursor/rules/backend-logic-explanations-human-language.mdc` | Copied / refreshed — backend bugs and logic choices name the business outcome first, not layer jargon |
 | `~/.cursor/statusline-loregate.sh` | Copied / refreshed — optional Cursor Agent CLI two-line context-spend status (enable in `cli-config.json`; see below) |
-| `~/.cursor/extensions/loregate-context-spend-status-<version>/` | Copied / refreshed — IDE status bar context-spend proxies (Reload Window after install; see below) |
+| `~/.cursor/extensions/loregate-context-spend-status-<version>/` | Copied / refreshed — Pipeline Map Webview + optional status chip (Reload Window; Command Palette → **Loregate: Show Pipeline Map**) |
 | `~/.cursor/cursor-spells-kit-path` | Text file with absolute path to this kit checkout |
 | `~/.cursor/cursor-spells-learn.json` | Created if missing — `land` (`draft_merge` default / `auto_push`); never overwritten on update |
 | `~/.cursor/lgt-policy-accepted` | Written on every install/update after public policy agreement (`accepted_at`, `agree_via`, `policy_hash`, …) |
@@ -129,7 +129,7 @@ Full behavior, snapshot rules, and stage mapping: [`docs/superpowers/specs/2026-
 
 ### IDE context-spend status bar (Agent Window)
 
-Install copies the compiled extension from `extensions/context-spend-status/` to `~/.cursor/extensions/loregate-context-spend-status-<version>/` (package manifest, README, and `out/` only). **Reload Window** once after install or update so Cursor loads it.
+Install copies the compiled extension from `extensions/context-spend-status/` to `~/.cursor/extensions/loregate-context-spend-status-<version>/` (package manifest, README, `out/`, and `media/`). **Reload Window** once after install or update. Primary UX for Agent Window: Command Palette → **Loregate: Show Pipeline Map** (polls `pipeline-status.sh` with no agent tokens). Design: [`docs/superpowers/specs/2026-10-29-pipeline-status-webview-panel-design.md`](docs/superpowers/specs/2026-10-29-pipeline-status-webview-panel-design.md).
 
 The status bar shows the same pipeline proxies as the CLI status line (`pipe …`, peak, ⚠ threshold) for Agent Window users. Click the item to open an Output channel with drill-down text.
 

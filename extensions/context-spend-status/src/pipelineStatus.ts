@@ -3,7 +3,10 @@ import path from "node:path";
 
 export type PipelineOrientation = {
   route: string;
+  layer: string;
   stage: string;
+  stagesEntered: string[];
+  pendingGates: unknown[];
   hasPipeline: boolean;
 };
 
@@ -90,17 +93,21 @@ function parseOrientation(json: string): PipelineOrientation {
 
   const record = parsed as Record<string, unknown>;
   const route = typeof record.route === "string" ? record.route : "unknown";
+  const layer = typeof record.layer === "string" ? record.layer : "idle";
   const stage = typeof record.stage === "string" ? record.stage : "idle";
   const pendingGates = Array.isArray(record.pending_gates)
     ? record.pending_gates
     : [];
   const stagesEntered = Array.isArray(record.stages_entered)
-    ? record.stages_entered
+    ? record.stages_entered.map(String)
     : [];
 
   return {
     route,
+    layer,
     stage,
+    stagesEntered,
+    pendingGates,
     hasPipeline:
       pendingGates.length > 0 ||
       stagesEntered.length > 0 ||

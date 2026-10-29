@@ -377,8 +377,11 @@ install_context_spend_status_extension() {
   cp "$ext_src/package.json" "$ext_dest/"
   cp "$ext_src/README.md" "$ext_dest/" 2>/dev/null || true
   cp -R "$ext_src/out" "$ext_dest/out"
+  if [[ -d "$ext_src/media" ]]; then
+    cp -R "$ext_src/media" "$ext_dest/media"
+  fi
   echo "copied: $ext_dest"
-  echo "hint: Reload Window to enable Loregate Context Spend status bar (Agent Window / IDE)"
+  echo "hint: Reload Window, then Command Palette → Loregate: Show Pipeline Map"
 }
 
 
