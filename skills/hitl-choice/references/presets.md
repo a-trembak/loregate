@@ -73,7 +73,7 @@ Ask only after the human chose `agent` on Tech-spec entry. Do not ask in `human`
 | `done` | Done reviewing — start review |
 | `fixes` | Describe fixes first |
 
-`approve` and `done` are equivalent. `fixes` is the structured stand-in for “or describe fixes first”; after selection, wait for the description. On the finish-plan path, a new Local Diff Review canvas outbound (`kind: local-diff-review/comments`, `intent: apply-fixes`) is the same fix cycle — see `skills/finish-plan/references/local-diff-review.md`. When a Local Diff Review canvas was built, the question prompt must tell the human to keep **Current thread** and press **Send** (or use `approve` / `done` / `skip`). Asking this gate does **not** end the pipeline: after `skip` / `approve` / `done`, engineer-review starts. Do not invoke `create-pr` here.
+`approve` and `done` are equivalent. `fixes` is the structured stand-in for “or describe fixes first”; after selection, wait for the description. Question prompt stays thin: start review now, or describe fixes first — do **not** lead with “If a Local Diff Review canvas is open…”. Local Diff Review gate runs **after** engineer-review settles (Teach-review miss, then canvas `approve-diff` / `comment`). Asking this gate does **not** end the pipeline: after `skip` / `approve` / `done`, engineer-review starts. Do not invoke `create-pr` here.
 
 ### Figma ask (frontend)
 
@@ -82,15 +82,23 @@ Ask only after the human chose `agent` on Tech-spec entry. Do not ask in `human`
 | `no_figma` | No Figma |
 | `have_urls` | I will paste Figma node URLs |
 
-On `no_figma`, treat as typed `no figma`. On `have_urls`, wait for pasted URLs before `csp-review-figma-markup`.
+On `no_figma`, treat as typed `no figma`. On `have_urls`, wait for pasted URLs; **as soon as URLs are in chat**, run the **Enable Figma MCP** check below before any Figma tool call or `csp-review-figma-markup`.
 
 If the session has **no Figma Model Context Protocol tools** (server disabled or missing from the catalog) and the task still needs Figma, ask **Enable Figma MCP** **before** this gate (or before loading `figma-use` / `csp-review-figma-markup`).
 
 ### Enable Figma MCP
 
-Ask only when Figma work is in scope (frontend implement or review with design URLs / about to ask **Figma ask**) **and** the live tool catalog has no usable Figma Model Context Protocol namespace (disabled, absent, or zero tools). This is **not** OAuth `mcp_auth` — Cursor has no Enable button in chat; the human toggles **Customize → MCPs → figma**.
+**Mandatory** whenever **any** of these is true **and** Figma Model Context Protocol tools are unusable in this session:
 
-Prompt must say in full words: open Customize, open Model Context Protocol, turn **figma** on, then choose Continue.
+1. The human pasted Figma URLs / node links in chat (including after `have_urls`, or unsolicited paste mid-pipeline).
+2. Clarifications / acceptance criteria / ticket / plan already contain Figma URLs and the agent is about to use them.
+3. About to ask **Figma ask**, or about to load `figma-use` / `figma-design-to-code` / dispatch `csp-review-figma-markup`.
+
+**How to detect “unusable” (do this every time before Figma work):** inspect the live tool catalog / dynamic namespaces for a Figma Model Context Protocol server (names like `plugin-figma-figma` / `figma`). Treat as unusable when the namespace is absent, disabled, `needsAuth` without usable tools, error, or exposes zero design tools. Prefer a quick `GetDynamicTools` / catalog probe over guessing.
+
+This is **not** OAuth `mcp_auth` — Cursor has no Enable button in chat; the human toggles **Customize → MCPs → figma**.
+
+Prompt must say in full words: open Customize, open Model Context Protocol, turn **figma** on, then choose Continue. Do **not** silently continue after a paste when tools are missing.
 
 | id | label |
 |----|-------|
@@ -99,7 +107,7 @@ Prompt must say in full words: open Customize, open Model Context Protocol, turn
 
 On `figma_enabled`: re-check the tool catalog once. If Figma tools are still missing, re-ask this gate once (same tokens); after a second miss, note `skill_missing: figma-mcp` / `figma_mcp: unavailable` and continue without inventing pixel diffs. On `skip_figma_mcp`: continue without Figma Model Context Protocol; treat markup compare as skipped / source-only as the caller already documents; do not invent design evidence.
 
-Do not ask this gate when Figma tools are already available, or when the human already chose `no_figma` / `no figma`.
+Do not ask this gate when Figma tools are already available, or when the human already chose `no_figma` / `no figma` / `skip_figma_mcp` earlier in this run.
 
 ### Docs update destination
 
@@ -232,7 +240,7 @@ Ask **after** a validated `csp-engineer-reviewer` or `csp-pr-reviewer` report is
 
 `no_miss` → do not invoke `teach-review`; do not run `csp-review-learn` `mode:capture`. `miss` → if this message has no description, wait for free text (open-ended), then invoke skill `teach-review`. `project_secret` → if this message has no description, wait for free text, then dispatch `csp-review-learn` `mode:capture` (never **Review-learn promote**, never kit git). Failure of `teach-review` must not retract the report. Do not write both stores on the same miss.
 
-After `no_miss`, after skill `teach-review` returns (success or failure), or after `project_secret` capture settles: on a **pipeline** review the **calling** pipeline skill must continue to skill `local-diff-review-gate` then skill `propose-commit` per engineer-review step 15. **`no_miss` is not permission to propose a commit** — Local Diff Review gate (`approve-diff` / `comment`) still comes next. Do **not** ask Local Diff Review gate or Propose commit from inside this miss preset — the calling skill owns those gates. Manual `/lgt-engineer-review` / `/lgt-pr-review` do **not** auto-start `local-diff-review-gate` or `propose-commit` unless the human asks.
+After `no_miss`, after skill `teach-review` returns (success or failure), or after `project_secret` capture settles: on a **pipeline** review the **calling** pipeline skill must continue to skill `local-diff-review-gate` then skill `propose-commit` (per engineer-review step 15), with a **Loop** on Local Diff `comment` back through engineer-review until `approve-diff`. If `local-diff-review-gate` returns `next_skill: engineer-review`, the caller **Loops** (re-run engineer-review). Only when the gate returns `next_skill: propose-commit` may the caller invoke skill `propose-commit`. **`no_miss` is not permission to propose a commit** — Local Diff Review gate (`approve-diff` / `comment`) still comes next. Do **not** ask Local Diff Review gate or Propose commit from inside this miss preset — the calling skill owns those gates. Manual `/lgt-engineer-review` / `/lgt-pr-review` do **not** auto-start `local-diff-review-gate` or `propose-commit` unless the human asks.
 
 ### Local Diff Review gate
 
@@ -243,7 +251,7 @@ Ask from skill `local-diff-review-gate` on the **pipeline** path only, after Tea
 | `approve-diff` | Diff is fine — continue to propose-commit |
 | `comment` | Open Local Diff Review canvas and wait for Send |
 
-On `comment`, the calling skill follows plugin `review-local-diff` in **this thread**, waits for a newer `outbound.sentAt` (or pasted JSON), applies comments without committing, then asks these two tokens **once more**. A second `comment` applies once more, then continues — do not loop further. On `approve-diff`, continue toward `propose-commit`.
+On `comment`, the calling skill follows plugin `review-local-diff` in **this thread**, applies pasted `local-diff-review/comments` via nested Task `csp-software-developer` without committing, then **returns** `next_skill: engineer-review` — the pipeline caller must re-run engineer-review (Loop); do **not** ask `approve-diff` / `comment` once more in the same turn. Green path: human `approve-diff` → gate returns `next_skill: propose-commit` → caller may invoke skill `propose-commit`.
 
 ### Capture-escape destination
 

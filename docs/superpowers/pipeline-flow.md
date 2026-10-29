@@ -200,7 +200,8 @@ flowchart TD
   reviewGate ==>|"skip / approve / done"| engReview
   engReview -.->|"Needs clarification"| engReview
   engReview ==> localDiffGate
-  localDiffGate ==>|"approve-diff / comment cycle"| proposeCommit
+  localDiffGate ==>|"approve-diff"| proposeCommit
+  localDiffGate -.->|"comment — Loop"| engReview
   proposeCommit ==>|"approve-commit"| updateDocs
   proposeCommit -.->|"revise"| proposeCommit
   updateDocs ==>|"skip / docs_md / docs_repo / confluence"| localDiffGate2
@@ -353,13 +354,13 @@ flowchart TD
 
 ## 6. review-gate → review routing
 
-Coding is done. This gate is **not** another Plan-layer step and **not** the pipeline end. Skill `finish-plan` (slash command `/lgt-finish-plan`) writes the marker, applies `review-surface` (`SetActiveBranch` + checkout in each open folder so the human can see the merge-base diff), asks HITL, then routes to engineer-review. When the branch has **zero commits ahead of base**, the merge-base pull request tab may be empty — `review-surface` prefers the **Local Diff Review** canvas (plugin skill `review-local-diff`; outbound `local-diff-review/comments` v1 on **Current thread**) and falls back to chat (`git status` / `git diff` summaries) when the plugin is missing. `fixes` (or canvas Send with `intent: apply-fixes`) returns to `csp-software-developer` (Build), then re-runs `review-surface` and re-asks this same gate. Product commits happen later via `propose-commit` (after engineer-review). GitHub `create-pr` still happens after docs and any residual `propose-commit`.
+Coding is done. This gate is **not** another Plan-layer step and **not** the pipeline end. Skill `finish-plan` (slash command `/lgt-finish-plan`) writes the marker, applies thin `review-surface` (`SetActiveBranch` + checkout in each open folder so the merge-base diff tab can show the branch), asks HITL (`skip` / `approve` / `done` / `fixes`), then routes to engineer-review. **This gate does not open the Local Diff Review canvas** — that canvas belongs to skill `local-diff-review-gate` **after** engineer-review and Teach-review miss. When the branch has **zero commits ahead of base**, the tab may be empty; `review-surface` may summarize the **uncommitted** working tree in chat (`git status` / `git diff`) — not a GitHub pull request. `fixes` returns to `csp-software-developer` (Build), then re-runs `review-surface` and re-asks this same gate. Product commits happen later via `propose-commit` (after engineer-review → miss → `local-diff-review-gate` Loop until `approve-diff`). GitHub `create-pr` still happens after docs and any residual `propose-commit`.
 
 ```mermaid
 flowchart TD
   planDone(["Build complete — plan already executed"])
   writeReview{{".cursor/gates/review-gate/slug"}}
-  surface["review-surface: checkout + SetActiveBranch + local-diff-review"]
+  surface["review-surface: checkout + SetActiveBranch"]
   hitlFinish[/"HITL: skip / approve / done / fixes"/]
   doFixes["csp-software-developer implements fixes"]
   delReview["Clear this slug review-gate"]
@@ -475,7 +476,7 @@ Auto-fix requires all four: deterministic check, single correct answer, no infor
 
 After a validated engineer-review report, HITL **Teach-review miss** (`miss` / `project_secret` / `no_miss`). `miss` invokes skill `teach-review` (kit `learn/…` branch and a ready-for-review pull request when `land` is `draft_merge`; does not merge to `main`). `project_secret` writes this project's `.cursor/review-learnings.md` only.
 
-Pipeline handoff (full / `--fast` / issue): invoke skill **`local-diff-review-gate`** next (HITL `approve-diff` / `comment`; skip if clean / missing plugin), then skill **`propose-commit`** — HITL `approve-commit` / `revise`, then `git commit` only (never push). **`no_miss` does not skip Local Diff Review** — order is miss answer → `local-diff-review-gate` → `propose-commit`. Writes `.cursor/gates/commit-approved/<slug>`. Full path continues to `update-docs`; if the tree is still dirty after docs, run **`local-diff-review-gate`** once more, then **`propose-commit`** again for residual files, then `create-pr`. Manual `/lgt-engineer-review` does not auto-start `local-diff-review-gate` or `propose-commit`.
+Pipeline handoff (full / `--fast` / issue): invoke skill **`local-diff-review-gate`** next (HITL `approve-diff` / `comment`; skip if clean / missing plugin), then skill **`propose-commit`** — HITL `approve-commit` / `revise`, then `git commit` only (never push). **`no_miss` does not skip Local Diff Review** — order is miss answer → `local-diff-review-gate` → (Loop on `comment`) → `propose-commit` on `approve-diff`. **Loop:** token `comment` applies canvas notes, sets `next_skill: engineer-review`, re-runs engineer-review and Teach-review miss, then **`local-diff-review-gate`** again until the human answers `approve-diff`. Writes `.cursor/gates/commit-approved/<slug>`. Full path continues to `update-docs`; if the tree is still dirty after docs, run **`local-diff-review-gate`** once more, then **`propose-commit`** again for residual files, then `create-pr`. Manual `/lgt-engineer-review` does not auto-start `local-diff-review-gate` or `propose-commit`.
 
 ---
 
@@ -486,6 +487,7 @@ flowchart TD
   reviewDone(["Review settled + teach-review handled"])
   localDiff[["local-diff-review-gate"]]
   hitlDiff[/"HITL: approve-diff / comment"/]
+  reReview[["engineer-review + teach-review miss"]]
   propose[["propose-commit"]]
   hitlCommit[/"HITL: approve-commit / revise"/]
   revise["Re-propose message + file list"]
@@ -495,7 +497,9 @@ flowchart TD
 
   reviewDone ==> localDiff
   localDiff ==> hitlDiff
-  hitlDiff -->|"approve-diff or comment cycle done"| propose
+  hitlDiff -->|"approve-diff"| propose
+  hitlDiff -.->|"comment — Loop"| reReview
+  reReview ==> localDiff
   propose ==> hitlCommit
   hitlCommit -->|"revise"| revise
   revise --> propose
@@ -535,7 +539,8 @@ stateDiagram-v2
   Building --> ReviewGate: re-ask review-gate
   Reviewing --> Reviewing: Needs clarification
   Reviewing --> LocalDiffGate: local-diff-review-gate
-  LocalDiffGate --> CommitGate: propose-commit writes commit-approved/slug
+  LocalDiffGate --> Reviewing: comment Loop
+  LocalDiffGate --> CommitGate: approve-diff then propose-commit
   CommitGate --> DocsGate: update-docs writes docs-gate/slug
   DocsGate --> LocalDiffGate: residual local-diff-review-gate if dirty
   DocsGate --> CommitGate: residual propose-commit if dirty

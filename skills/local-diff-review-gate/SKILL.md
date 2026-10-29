@@ -33,7 +33,7 @@ For **each** repo in map order:
 
 1. **Focus that repo only.** Prefer session tool `move_agent_to_root` (or equivalent) into that repo's absolute root. The canvas filename is shared — **never** open two Local Diff Review canvases at once.
 
-2. **Plugin missing:** if skill `review-local-diff` cannot be loaded / skill file missing → one sentence to the human, run-log note `skipped-missing-plugin`, continue to the next repo (or to `propose-commit` when done). Do not invent a canvas.
+2. **Plugin missing:** if skill `review-local-diff` cannot be loaded / skill file missing → one sentence to the human, run-log note `skipped-missing-plugin`, continue to the next repo (or return `next_skill: propose-commit` when all repos are done). Do not invent a canvas.
 
 3. **Clean tree:** if both `git diff HEAD` and `git diff --cached` are empty → skip quietly, run-log note `skipped-clean`, next repo.
 
@@ -44,18 +44,17 @@ For **each** repo in map order:
    | `approve-diff` | Diff is fine; leave this repo and continue |
    | `comment` | Open the canvas and wait for Send |
 
-5. On **`approve-diff`:** run-log note `approve-diff`; next repo (or continue to `propose-commit`).
+5. On **`approve-diff`:** run-log note `approve-diff`; next repo. When all repos done with only approve-diff / skips → return `next_skill: propose-commit`.
 
 6. On **`comment`:**
-   1. Follow plugin skill `review-local-diff`: run `bin/build-canvas.mjs` (do not hand-write the canvas or parse `git diff`). Link the canvas.
-   2. Tell the human: **Prepare for this chat** → **copy the paste block** → **paste into this thread** (keeps pipeline context). Optional **Open new chat** only if losing history is OK. Agents do not auto-read the sidecar; Canvas cannot inject into this thread.
-   3. **Do not poll** `*.canvas.data.json`. End the turn; wait for the human’s next reply here.
-   4. When they paste `local-diff-review/comments` (or say apply local-diff comments), apply those comments here, then `build-canvas.mjs --refresh --fresh-ui`. Do **not** commit, push, or open a PR.
-   5. Ask the same two tokens **once more** (`approve-diff` / `comment`).
-   6. If the second answer is `comment` again: rebuild canvas via script, same paste-into-this-thread flow once more, then **continue** (do not loop further). Run-log note `comment`.
-   7. If the second answer is `approve-diff`: run-log note `approve-diff`; continue.
+   1. Follow plugin skill `review-local-diff`: run `bin/build-canvas.mjs`. Link the canvas.
+   2. Tell the human: Prepare for this chat → copy paste block → paste into this thread.
+   3. Do not poll `*.canvas.data.json`. End the turn; wait for the human’s reply here.
+   4. When they paste `local-diff-review/comments` (or ask to apply local-diff comments), dispatch nested Task `csp-software-developer` with a brief from each `{ path, line?, body }` plus `notes`. Wait for it to return. Refresh canvas via `build-canvas.mjs --refresh --fresh-ui` if useful. Do **not** commit, push, or open a pull request.
+   5. Run-log note `comment`.
+   6. **Return immediately** to the caller with `next_skill: engineer-review` (pipeline Loop). Do **not** ask `approve-diff` / `comment` again in this turn. Do **not** invoke `propose-commit`.
 
-7. After all repos: return to the caller so it can invoke `propose-commit`.
+7. After all repos without a Loop return: return `next_skill: propose-commit` so the caller can invoke propose-commit.
 
 ## Run-log
 
@@ -69,3 +68,5 @@ When `invocation_id` is known: `scripts/pipeline-run-log.sh append --root <proje
 - Never render the review in Source Control or on GitHub as a substitute for this canvas.
 - Never vendor the plugin skill body into this repository.
 - Manual engineer-review does not auto-start this gate.
+- Never continue to `propose-commit` after applying Local Diff comments; always return `next_skill: engineer-review`.
+- Never use a second-comment “then continue” shortcut; Loop ends only on human `approve-diff` (or skip clean / missing plugin).

@@ -76,7 +76,7 @@ if [[ -n "$plan_path" ]]; then
     # HITL", the agent re-asks forever and ignores a prior user skip/approve/done
     # that arrived while the stop-hook loop was running. Prefer honoring an
     # existing answer; only re-ask when none is in the chat yet.
-    message="Plan-complete marker still present (${rel_gate}, plan: ${plan_path}). If the user already replied skip, approve, or done anywhere in this chat after the gate was asked, delete ${rel_gate} immediately and continue skill finish-plan (start csp-engineer-reviewer or csp-multi-repo-supervisor). Do not re-ask. If they have not answered yet: apply review-surface first (checkout the feature branch in each open folder, call SetActiveBranch, prefer Local Diff Review / review-local-diff for uncommitted trees — do not create-pr, pipeline is not finished), then ask HITL via skill hitl-choice (AskQuestion when available; else typed skip / approve / done). Treat a new canvas outbound local-diff-review/comments with intent apply-fixes as fixes."
+    message="Plan-complete marker still present (${rel_gate}, plan: ${plan_path}). If the user already replied skip, approve, or done anywhere in this chat after the gate was asked, delete ${rel_gate} immediately and continue skill finish-plan (start csp-engineer-reviewer or csp-multi-repo-supervisor). Do not re-ask. If they have not answered yet: apply review-surface first (checkout the feature branch in each open folder, call SetActiveBranch — do not create-pr, pipeline is not finished), then ask HITL via skill hitl-choice (AskQuestion when available; else typed skip / approve / done / fixes). After skip / approve / done, start engineer-review."
     emit_followup "$message"
     exit 0
   fi

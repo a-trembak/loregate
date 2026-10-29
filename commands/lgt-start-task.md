@@ -35,7 +35,7 @@ Feature-work entry. Short router: select the path, then load **one** mode file. 
 
 | Path | Load and execute (only this file) |
 |------|-----------------------------------|
-| **Full** | [`references/lgt-start-task-full.md`](references/lgt-start-task-full.md) — includes bootstrap (Pipeline language, `pipeline-run-log.sh init`), tech-spec → plan → critic → `csp-software-developer` (**Wait for**; do not treat dispatch as the end) → finish-plan (`review-surface` / `SetActiveBranch` / local-diff-review) → engineer-review → `local-diff-review-gate` → `propose-commit` → `update-docs` (do not treat update-docs as the end; `create-pr` immediately) → Pipeline finale. Session `full-happy-path`. Pass `jira_status` into `create-pr`. |
+| **Full** | [`references/lgt-start-task-full.md`](references/lgt-start-task-full.md) — includes bootstrap (Pipeline language, `pipeline-run-log.sh init`), tech-spec → plan → critic → `csp-software-developer` (**Wait for**; do not treat dispatch as the end) → finish-plan (`review-surface` / `SetActiveBranch`; no Local Diff canvas) → engineer-review → `local-diff-review-gate` → `propose-commit` → `update-docs` (do not treat update-docs as the end; `create-pr` immediately) → Pipeline finale. Session `full-happy-path`. Pass `jira_status` into `create-pr`. |
 | **Fast** | [`references/lgt-start-task-fast.md`](references/lgt-start-task-fast.md) — bootstrap + brief (`brief-upsert`) + `csp-software-developer` **`mode:fast`** (**Wait for**) → engineer-review → `local-diff-review-gate` → `propose-commit` → `create-pr`. Session `fast-skips-plan-layer`. |
 | **Issue** | [`lgt-start-issue-task.md`](lgt-start-issue-task.md) from its step 3 |
 

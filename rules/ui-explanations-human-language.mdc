@@ -1,0 +1,16 @@
+---
+description: UI bugs, reviews, and screen choices — name what the human sees, not component props
+alwaysApply: true
+---
+
+# UI explanations in human language
+
+When explaining UI bugs, review findings, or closed-set choices about screens:
+
+1. Name what the human sees first: the square preview, the remove cross, the eye or download icon, the green badge, the filename bubble on hover — not internal props (`openerChild`, `endIcon`, `capture host`, `chip`).
+2. If a technical name is needed, put it in backticks after the plain phrase once: the remove cross (`ThemedIconButton`).
+3. Decision options must say what changes on screen and for whom (desktop hover versus phone tap), not only which component wraps which.
+4. Prefer one short concrete example (“tap the PDF thumb on a phone”) before architecture.
+5. Never open a clarify question with undefined jargon stacks joined by slashes.
+
+Companion rules: `plain-language-chat` (full words and full sentences) and `backend-logic-explanations-human-language` (server-side behaviour in business terms). This rule only covers on-screen wording.

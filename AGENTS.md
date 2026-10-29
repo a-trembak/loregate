@@ -8,6 +8,8 @@ Load skill `plain-language-chat` before any user-facing message. Write full word
 
 Keep exact only inside backticks or code fences: paths, symbols, error strings, ticket keys, URLs, slash-command names.
 
+For UI bugs, reviews, and screen choices, follow always-on rule `ui-explanations-human-language`: name what the human sees first, not component props. For backend bugs, reviews, and logic choices, follow always-on rule `backend-logic-explanations-human-language`: name the business outcome first, not layer jargon.
+
 Kit documentation and foreign-facing copy stay English. Legal / policy docs: `docs/legal/`.
 
 ## Skill authoring

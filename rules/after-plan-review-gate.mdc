@@ -15,16 +15,16 @@ globs:
 
 When you **finish executing an implementation plan** (all plan tasks done, or you are about to declare the plan complete):
 
-1. Prefer invoking skill **`finish-plan`** (writes this plan's `review-gate/<slug>`, applies `review-surface` / `SetActiveBranch` and Local Diff Review when available so the human can see the diff, then asks HITL via `hitl-choice` (AskQuestion required; text only after failed/missing tool)). Do **not** invoke `create-pr` at this gate — the pipeline is not finished.
+1. Prefer invoking skill **`finish-plan`** (writes this plan's `review-gate/<slug>`, applies `review-surface` / checkout + `SetActiveBranch` only, then asks HITL via `hitl-choice` (AskQuestion required; text only after failed/missing tool)). Do **not** invoke `create-pr` at this gate — the pipeline is not finished.
 2. If you cannot load that skill, still:
    - Create `.cursor/gates/review-gate/<slug>` (line 1 = plan path) via `pg_write_gate` when `scripts/pipeline-gates.sh` is present
-   - Check out the feature branch in each folder the human has open and call `SetActiveBranch` for each (see `skills/finish-plan/references/review-surface.md`); prefer `skills/finish-plan/references/local-diff-review.md` for uncommitted trees when the plugin is present
+   - Check out the feature branch in each folder the human has open and call `SetActiveBranch` for each (see `skills/finish-plan/references/review-surface.md`); do **not** run skill `review-local-diff` or build a Local Diff canvas
    - **Stop** and ask via skill **`hitl-choice`** (AskQuestion required; preset Finish-plan HITL); text only after failed/missing tool:
 
-   > Plan done. The pull request tab and/or Local Diff Review canvas should show the diff. This is your look — engineer-review starts after you answer.
-   > - `skip` — start csp-engineer-reviewer now
-   > - `approve` / `done` — I finished my look; start engineer-review
-   > - or describe fixes first (including canvas Send on Current thread)
+   > Plan done. Feature branches are checked out locally. This gate starts engineer-review — your full Local Diff look comes after that review. Answer:
+   > - `skip` — start engineer-review now
+   > - `approve` / `done` — start engineer-review
+   > - `fixes` — describe fixes first (typed notes); developer applies them, then this gate is asked again
 
 3. Do **not** start `csp-engineer-reviewer` / `/lgt-engineer-review` until the user replies `skip`, `approve`, or `done`. If they already replied one of those tokens after the gate was asked, do not re-ask — clear this plan's marker and continue.
 4. On that reply: delete `.cursor/gates/review-gate/<slug>` first (`pg_clear_gate`); on frontend ask for Figma URLs via `hitl-choice` Figma preset (or `no figma`); then run engineer-review. `skip` / `approve` / `done` all start review (they are not “skip review” / “close without review”).

@@ -31,7 +31,7 @@ All required:
 2. An engineer-review report for **this run** is settled (no blocking open clarifications that the pipeline treats as not ready to continue).
 3. `repo → branch` map from the handoff, or a resolvable current feature branch.
 4. `plan_path` when known (implementation plan or issue fix plan). If the handoff has `plan_path: none` (fast brief only), use synthetic path `runs/<feature-branch-name>` as the plan path argument to gate helpers.
-5. **Local Diff Review gate settled this pipeline turn** before any commit proposal: skill `local-diff-review-gate` must already have finished for the current dirty set (human `approve-diff`, completed `comment` cycle, run-log `skipped-clean`, or `skipped-missing-plugin`). If `git diff HEAD` or `git diff --cached` is non-empty in any target repo and that gate has **not** settled this turn: **stop**, invoke skill `local-diff-review-gate` first, and do **not** propose a commit message or ask `approve-commit`.
+5. **Local Diff Review gate green return** before any commit proposal: skill `local-diff-review-gate` must have returned `next_skill: propose-commit` for the current dirty set (every dirty repo human `approve-diff`, or run-log `skipped-clean` / `skipped-missing-plugin` only — no pending Loop). Jumping here while the gate returned `next_skill: engineer-review` (Local Diff `comment` applied, Loop pending) is **forbidden**. If `git diff HEAD` or `git diff --cached` is non-empty in any target repo and the gate has **not** returned `next_skill: propose-commit` this turn: **stop**, invoke skill `local-diff-review-gate` first, and do **not** propose a commit message or ask `approve-commit`.
 
 If any fail: **stop** and say which precondition is missing. Do not commit. Do not ask Propose commit.
 
