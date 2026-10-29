@@ -109,23 +109,6 @@ On `figma_enabled`: re-check the tool catalog once. If Figma tools are still mis
 
 Do not ask this gate when Figma tools are already available, or when the human already chose `no_figma` / `no figma` / `skip_figma_mcp` earlier in this run.
 
-If the session has **no Figma Model Context Protocol tools** (server disabled or missing from the catalog) and the task still needs Figma, ask **Enable Figma MCP** **before** this gate (or before loading `figma-use` / `csp-review-figma-markup`).
-
-### Enable Figma MCP
-
-Ask only when Figma work is in scope (frontend implement or review with design URLs / about to ask **Figma ask**) **and** the live tool catalog has no usable Figma Model Context Protocol namespace (disabled, absent, or zero tools). This is **not** OAuth `mcp_auth` — Cursor has no Enable button in chat; the human toggles **Customize → MCPs → figma**.
-
-Prompt must say in full words: open Customize, open Model Context Protocol, turn **figma** on, then choose Continue.
-
-| id | label |
-|----|-------|
-| `figma_enabled` | I turned Figma on — continue |
-| `skip_figma_mcp` | Continue without Figma tools |
-
-On `figma_enabled`: re-check the tool catalog once. If Figma tools are still missing, re-ask this gate once (same tokens); after a second miss, note `skill_missing: figma-mcp` / `figma_mcp: unavailable` and continue without inventing pixel diffs. On `skip_figma_mcp`: continue without Figma Model Context Protocol; treat markup compare as skipped / source-only as the caller already documents; do not invent design evidence.
-
-Do not ask this gate when Figma tools are already available, or when the human already chose `no_figma` / `no figma`.
-
 ### Docs update destination
 
 | id | label |
