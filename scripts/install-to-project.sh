@@ -359,7 +359,8 @@ install_context_spend_status_extension() {
     return 0
   fi
   ext_ver="$(python3 -c 'import json;print(json.load(open("'"$ext_src"'/package.json"))["version"])')"
-  ext_dest="$HOME/.cursor/extensions/loregate-context-spend-status-$ext_ver"
+  # Cursor/VS Code loads ~/.cursor/extensions/<publisher>.<name>-<version>/
+  ext_dest="$HOME/.cursor/extensions/loregate.loregate-context-spend-status-$ext_ver"
 
   # Always recompile so git pull + lgt install does not leave stale out/.
   if ! (cd "$ext_src" && npm install --no-fund --no-audit && npm run compile); then

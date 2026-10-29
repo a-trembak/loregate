@@ -22,7 +22,7 @@ Success: after `lgt install` / Reload Window, **Loregate: Show Pipeline Map** op
 | Refresh | ~3s poll + workspace folder change; extension-only (zero model tokens) |
 | Tree states | `done` (green), `here` (current), `waiting` (ahead), `blocked` (pending human gate when stage matches pending) |
 | Loop (v1) | Current stage `local-diff-review-gate` (and similar) shown as `here`; blocked styling when a pending gate matches; full Loop counter can wait for richer run-log |
-| Install | Existing `lgt install` copy to `~/.cursor/extensions/loregate-context-spend-status-<ver>/` |
+| Install | Existing `lgt install` copy to `~/.cursor/extensions/loregate.loregate-context-spend-status-<ver>/` |
 | Out of scope | Native macOS menu bar; Canvas status; changing pipeline gate order |
 
 ## Rejected alternatives
