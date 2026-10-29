@@ -16,7 +16,7 @@ During **local-diff-review-gate**, after checkout + `SetActiveBranch` when appli
 
 1. Unless the human already sent `no-local-diff-review` in this gate turn.
 2. Pass absolute git roots from the changed repos (each open-folder root) and, when known, the current agent `conversationId`.
-3. Prefer this canvas over pasting the full `git diff` into chat. Chat paste remains the **fallback** when the plugin is missing or canvas fails.
+3. Prefer this canvas over pasting the full `git diff` into chat. When the plugin is missing, skill `local-diff-review-gate` skips with run-log `skipped-missing-plugin` and returns `next_skill: propose-commit` (not a chat `git diff` primary path). Chat paste remains a **fallback** only for `no-local-diff-review` or canvas failure after the human opted out.
 
 ## How to run
 
@@ -65,21 +65,20 @@ Minimal shape (v1):
 
 ## Wait and apply-fixes handoff
 
-After the canvas exists:
+During skill **`local-diff-review-gate`** (not finish-plan review-gate — no finish-plan-style `fixes` re-ask):
 
-1. Ask the gate HITL via skill `hitl-choice` when the gate requires it.
-2. Also watch the canvas sidecar at the **exact** path from the canvas save (and any `.canvas.data.json` beside it). Do **not** browse or glob the canvases store.
-3. When a **new** valid outbound arrives with `intent: apply-fixes` and non-empty `comments` and/or non-empty `notes`:
-   - Treat it like `fixes` on the gate (even if the human did not click the `fixes` button).
-   - Build a brief for nested Task `csp-software-developer`: each `path` + optional `line` + `body`, plus `notes`.
-   - Wait for `csp-software-developer` to return.
+1. Ask the gate HITL via skill `hitl-choice` when the gate requires it (`approve-diff` / `comment`).
+2. On **`comment`**, follow plugin skill `review-local-diff`, link the canvas, and end the turn waiting for this thread (paste block or sidecar — do **not** poll `*.canvas.data.json`).
+3. When the human sends **`local-diff-review/comments`** (paste or sidecar with `intent: apply-fixes` and non-empty `comments` and/or `notes`):
+   - Build a brief for nested Task **`csp-software-developer`**: each `path` + optional `line` + `body`, plus `notes`.
+   - Wait for `csp-software-developer` to return (no commit, push, or pull request).
    - Score per skill `trajectory-score` when the gate protocol requires it.
-   - **Re-run** the gate surface (new canvas / reset last-handled `sentAt`) and re-ask HITL when required.
-4. Typed `fixes` / pasted comment text without sidecar still means the same fix cycle (chat fallback brief).
+   - **Return immediately** to the pipeline caller with **`next_skill: engineer-review`** (Loop). Do **not** ask `approve-diff` / `comment` again in the same turn. Do **not** invoke `propose-commit`.
+4. The **caller** re-runs engineer-review, Teach-review miss, then **`local-diff-review-gate`** again until the human answers `approve-diff` and the gate returns **`next_skill: propose-commit`**.
 
 ## Missing plugin
 
-If `review-local-diff` (or Canvas) is unavailable: continue with the chat `git status` / `git diff` fallback; record `skill_missing: review-local-diff` in the gate turn (Coverage-style note in chat is enough). HITL tokens unchanged.
+If skill `review-local-diff` (or Canvas) cannot be loaded: one sentence to the human, run-log note **`skipped-missing-plugin`**, record `skill_missing: review-local-diff` when Coverage-style notes are required, skip the canvas for that repo, and continue (return **`next_skill: propose-commit`** when all repos are handled — same as skill `local-diff-review-gate`). Do **not** treat chat `git status` / `git diff` as the primary substitute for the missing plugin on the pipeline path.
 
 ## Escape
 

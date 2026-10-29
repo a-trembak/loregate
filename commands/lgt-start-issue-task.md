@@ -41,8 +41,8 @@ Bug-fix entry point. Chains diagnose → plan → critic → fix → review → 
 
 6. **Engineer review** (automatic): immediately after `csp-bug-fixer` returns, run agent **`csp-engineer-reviewer`** (or `csp-multi-repo-supervisor` when 2+ repos changed per multi-repo probe). Skip `finish-plan` HITL. Skip Figma ask unless node URLs were already in the ticket/context. HITL only for **Needs clarification** via `hitl-choice`.
 
-6b. **Local Diff Review gate** — invoke skill **`local-diff-review-gate`** (HITL `approve-diff` / `comment`).
-6c. **Propose commit** — invoke skill **`propose-commit`** (HITL `approve-commit` / `revise`).
+6b. **Local Diff Review gate** — invoke skill **`local-diff-review-gate`** (HITL `approve-diff` / `comment`). If the gate returns **`next_skill: engineer-review`**, re-run engineer-review and Teach-review miss, then skill **`local-diff-review-gate`** again (**Loop** until the gate returns **`next_skill: propose-commit`**).
+6c. **Propose commit** — invoke skill **`propose-commit`** (HITL `approve-commit` / `revise`) only after the local-diff gate returns **`next_skill: propose-commit`**.
 
 7. **Create PR** (automatic): invoke skill **`create-pr`** (push + draft + Pipeline finale). Do not expect `create-pr` to invent product commits. Draft PR title includes the Jira key; body links the ticket and fix plan path. Pass `jira_key` / `jira_cloud_id` for the Pipeline finale HITL.
 
