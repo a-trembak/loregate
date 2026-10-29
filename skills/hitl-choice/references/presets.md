@@ -73,7 +73,7 @@ Ask only after the human chose `agent` on Tech-spec entry. Do not ask in `human`
 | `done` | Done reviewing — start review |
 | `fixes` | Describe fixes first |
 
-`approve` and `done` are equivalent. `fixes` is the structured stand-in for “or describe fixes first”; after selection, wait for the description. On the finish-plan path, a new Local Diff Review canvas outbound (`kind: local-diff-review/comments`, `intent: apply-fixes`) is the same fix cycle — see `skills/finish-plan/references/local-diff-review.md`. When a Local Diff Review canvas was built, the question prompt must tell the human to keep **Current thread** and press **Send** (or use `approve` / `done` / `skip`). Asking this gate does **not** end the pipeline: after `skip` / `approve` / `done`, engineer-review starts. Do not invoke `create-pr` here.
+`approve` and `done` are equivalent. `fixes` is the structured stand-in for “or describe fixes first”; after selection, wait for the description. Question prompt stays thin: start review now, or describe fixes first — do **not** lead with “If a Local Diff Review canvas is open…”. Local Diff Review gate runs **after** engineer-review settles (Teach-review miss, then canvas `approve-diff` / `comment`). Asking this gate does **not** end the pipeline: after `skip` / `approve` / `done`, engineer-review starts. Do not invoke `create-pr` here.
 
 ### Figma ask (frontend)
 
@@ -240,7 +240,7 @@ Ask **after** a validated `csp-engineer-reviewer` or `csp-pr-reviewer` report is
 
 `no_miss` → do not invoke `teach-review`; do not run `csp-review-learn` `mode:capture`. `miss` → if this message has no description, wait for free text (open-ended), then invoke skill `teach-review`. `project_secret` → if this message has no description, wait for free text, then dispatch `csp-review-learn` `mode:capture` (never **Review-learn promote**, never kit git). Failure of `teach-review` must not retract the report. Do not write both stores on the same miss.
 
-After `no_miss`, after skill `teach-review` returns (success or failure), or after `project_secret` capture settles: on a **pipeline** review the **calling** pipeline skill must continue to skill `local-diff-review-gate` then skill `propose-commit` per engineer-review step 15. **`no_miss` is not permission to propose a commit** — Local Diff Review gate (`approve-diff` / `comment`) still comes next. Do **not** ask Local Diff Review gate or Propose commit from inside this miss preset — the calling skill owns those gates. Manual `/lgt-engineer-review` / `/lgt-pr-review` do **not** auto-start `local-diff-review-gate` or `propose-commit` unless the human asks.
+After `no_miss`, after skill `teach-review` returns (success or failure), or after `project_secret` capture settles: on a **pipeline** review the **calling** pipeline skill must run skill `local-diff-review-gate` next (per engineer-review step 15). If that gate returns `next_skill: engineer-review`, the caller **Loops** (re-run engineer-review). Only when the gate returns `next_skill: propose-commit` may the caller invoke skill `propose-commit`. **`no_miss` is not permission to propose a commit** — Local Diff Review gate (`approve-diff` / `comment`) still comes next. Do **not** ask Local Diff Review gate or Propose commit from inside this miss preset — the calling skill owns those gates. Manual `/lgt-engineer-review` / `/lgt-pr-review` do **not** auto-start `local-diff-review-gate` or `propose-commit` unless the human asks.
 
 ### Local Diff Review gate
 
@@ -251,7 +251,7 @@ Ask from skill `local-diff-review-gate` on the **pipeline** path only, after Tea
 | `approve-diff` | Diff is fine — continue to propose-commit |
 | `comment` | Open Local Diff Review canvas and wait for Send |
 
-On `comment`, the calling skill follows plugin `review-local-diff` in **this thread**, waits for a newer `outbound.sentAt` (or pasted JSON), applies comments without committing, then asks these two tokens **once more**. A second `comment` applies once more, then continues — do not loop further. On `approve-diff`, continue toward `propose-commit`.
+On `comment`, the calling skill follows plugin `review-local-diff` in **this thread**, applies pasted `local-diff-review/comments` via nested Task `csp-software-developer` without committing, then **returns** `next_skill: engineer-review` — the pipeline caller must re-run engineer-review (Loop); do **not** ask `approve-diff` / `comment` once more in the same turn. Green path: human `approve-diff` → gate returns `next_skill: propose-commit` → caller may invoke skill `propose-commit`.
 
 ### Capture-escape destination
 
