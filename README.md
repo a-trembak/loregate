@@ -78,6 +78,8 @@ Two places: **Cursor user dir** (`~/.cursor`) and **the project**.
 | `~/.cursor/rules/plain-language-chat.mdc` | Copied / refreshed — always-on full-words, full-sentence chat in the selected pipeline language (pipeline gate rules stay project-only) |
 | `~/.cursor/rules/pipeline-language-no-russian.mdc` | Copied / refreshed — sanctions policy: never use Russian in agent chat or language settings |
 | `~/.cursor/rules/code-via-coding-agents.mdc` | Copied / refreshed — parent chat must dispatch `csp-software-developer` / `csp-bug-fixer` for product code |
+| `~/.cursor/rules/ui-explanations-human-language.mdc` | Copied / refreshed — UI bugs and screen choices name what the human sees, not component props |
+| `~/.cursor/rules/backend-logic-explanations-human-language.mdc` | Copied / refreshed — backend bugs and logic choices name the business outcome first, not layer jargon |
 | `~/.cursor/statusline-loregate.sh` | Copied / refreshed — optional Cursor Agent CLI two-line context-spend status (enable in `cli-config.json`; see below) |
 | `~/.cursor/extensions/loregate-context-spend-status-<version>/` | Copied / refreshed — IDE status bar context-spend proxies (Reload Window after install; see below) |
 | `~/.cursor/cursor-spells-kit-path` | Text file with absolute path to this kit checkout |
@@ -150,6 +152,8 @@ Consumer projects may add `.cursor/gates/context-spend/` to `.gitignore` if they
 | `<project>/.cursor/rules/plain-language-chat.mdc` | Copied / refreshed — chat with the human uses full words and full sentences in the selected pipeline language |
 | `<project>/.cursor/rules/pipeline-language-no-russian.mdc` | Copied / refreshed — sanctions policy: Russian language never allowed in agent communication or pipeline language settings |
 | `<project>/.cursor/rules/code-via-coding-agents.mdc` | Copied / refreshed — parent chat must dispatch coding agents for product code |
+| `<project>/.cursor/rules/ui-explanations-human-language.mdc` | Copied / refreshed — UI bugs and screen choices name what the human sees, not component props |
+| `<project>/.cursor/rules/backend-logic-explanations-human-language.mdc` | Copied / refreshed — backend bugs and logic choices name the business outcome first, not layer jargon |
 | `<project>/.cursor/cursor-spells-kit-path` | Absolute path to the kit |
 | `<project>/.cursor/cursor-spells-learn.json` | Created if missing — same template; never overwritten on update. Project `land` wins over the user file |
 | `<project>/.cursor/lgt-policy-accepted` | Also written on project install/update (`agree_via` may be `flag`, `prompt`, or `prior-user`) |

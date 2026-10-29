@@ -1,0 +1,17 @@
+---
+description: Backend bugs, reviews, and logic choices — name the business outcome first, not layer jargon
+alwaysApply: true
+---
+
+# Backend logic explanations in human language
+
+When explaining backend bugs, review findings, or closed-set choices about server-side behaviour:
+
+1. Name the outcome a human or operator cares about first: the invoice stays draft, the meter reading is rejected, the user cannot log in, the email never leaves the queue — not internal layer labels (`service`, `repository`, `DTO`, `mapper`, `interceptor`, `aggregate`).
+2. If a technical name is needed, put it in backticks after the plain phrase once: the save path that writes the draft (`InvoiceService.saveDraft`).
+3. Decision options must say what changes for the business flow and who is affected (customer, admin, nightly job), not only which class calls which.
+4. Prefer one short concrete example (“a night job with reading `0` on meter `M-12`”) before architecture, schema, or transaction details.
+5. Trace the path in plain steps when useful: request in → check or rule → write or side effect → response or error the caller sees. Keep symbols in backticks.
+6. Never open a clarify question with undefined jargon stacks joined by slashes (`ACL/DTO/UoW`, `saga/outbox/retry`).
+
+Companion rules: `plain-language-chat` (full words and full sentences) and `ui-explanations-human-language` (what appears on screen). This rule only covers server-side behaviour wording.

@@ -91,6 +91,11 @@ Decision asks in any selected language use the same sentence shape (subject + ve
 
 File paths, symbol names, error strings, ticket keys (`ACP-2656`), URLs, slash-command names (`/lgt-start-task`), CLI flags.
 
+## Domain companions (always-on rules)
+
+- Screens / UI bugs / screen Decision options → rule `ui-explanations-human-language` (what the human sees first).
+- Backend bugs / server logic Decision options → rule `backend-logic-explanations-human-language` (business outcome first).
+
 ## Red flags — rewrite before send
 
 - A run of capital letters used as a word (PR, HITL, AC, SHA, MCP)

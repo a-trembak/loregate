@@ -397,6 +397,10 @@ install_user_bits() {
   echo "copied: $HOME/.cursor/rules/pipeline-language-no-russian.mdc"
   cp "$KIT_ROOT/rules/code-via-coding-agents.mdc" "$HOME/.cursor/rules/code-via-coding-agents.mdc"
   echo "copied: $HOME/.cursor/rules/code-via-coding-agents.mdc"
+  cp "$KIT_ROOT/rules/ui-explanations-human-language.mdc" "$HOME/.cursor/rules/ui-explanations-human-language.mdc"
+  echo "copied: $HOME/.cursor/rules/ui-explanations-human-language.mdc"
+  cp "$KIT_ROOT/rules/backend-logic-explanations-human-language.mdc" "$HOME/.cursor/rules/backend-logic-explanations-human-language.mdc"
+  echo "copied: $HOME/.cursor/rules/backend-logic-explanations-human-language.mdc"
   cp "$KIT_ROOT/scripts/statusline-loregate.sh" "$HOME/.cursor/statusline-loregate.sh"
   chmod +x "$HOME/.cursor/statusline-loregate.sh"
   echo "copied: $HOME/.cursor/statusline-loregate.sh"
@@ -437,7 +441,7 @@ install_project_bits() {
 
   # Rules — always refresh from kit
   local rule
-  for rule in after-plan-review-gate.mdc before-build-critique-gate.mdc clean-decision-docs.mdc hitl-askquestion.mdc plain-language-chat.mdc pipeline-language-no-russian.mdc code-via-coding-agents.mdc; do
+  for rule in after-plan-review-gate.mdc before-build-critique-gate.mdc clean-decision-docs.mdc hitl-askquestion.mdc plain-language-chat.mdc pipeline-language-no-russian.mdc code-via-coding-agents.mdc ui-explanations-human-language.mdc backend-logic-explanations-human-language.mdc; do
     cp "$KIT_ROOT/rules/$rule" "$PROJECT/.cursor/rules/$rule"
     echo "copied: $PROJECT/.cursor/rules/$rule"
   done
