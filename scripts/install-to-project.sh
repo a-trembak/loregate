@@ -329,6 +329,12 @@ sync_kit_entries_into() {
 # the agent workspace after lgt install.
 install_pipeline_canvas_user() {
   mkdir -p "$HOME/.cursor/pipeline-canvases"
+  # Replace a stale symlink-to-kit with a real file (cp onto a symlink to the
+  # same path fails on macOS with "identical" and would abort set -e before
+  # install_context_spend_status_extension).
+  if [[ -L "$HOME/.cursor/pipeline-canvases/pipeline-flow.html" ]]; then
+    rm -f "$HOME/.cursor/pipeline-canvases/pipeline-flow.html"
+  fi
   cp "$KIT_ROOT/docs/superpowers/pipeline-flow.html" "$HOME/.cursor/pipeline-canvases/pipeline-flow.html"
   echo "copied: $HOME/.cursor/pipeline-canvases/pipeline-flow.html"
 }
@@ -359,7 +365,10 @@ install_context_spend_status_extension() {
     return 0
   fi
   ext_ver="$(python3 -c 'import json;print(json.load(open("'"$ext_src"'/package.json"))["version"])')"
-  ext_dest="$HOME/.cursor/extensions/loregate-context-spend-status-$ext_ver"
+  ext_pub="$(python3 -c 'import json;print(json.load(open("'"$ext_src"'/package.json")).get("publisher","loregate"))')"
+  ext_name="$(python3 -c 'import json;print(json.load(open("'"$ext_src"'/package.json"))["name"])')"
+  # Cursor/VS Code expects publisher.name-version under ~/.cursor/extensions/
+  ext_dest="$HOME/.cursor/extensions/${ext_pub}.${ext_name}-${ext_ver}"
 
   # Always recompile so git pull + lgt install does not leave stale out/.
   if ! (cd "$ext_src" && npm install --no-fund --no-audit && npm run compile); then
