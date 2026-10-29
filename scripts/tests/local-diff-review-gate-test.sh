@@ -90,6 +90,18 @@ assert_grep readme "README.md" "local-diff-review-gate"
 
 assert_no_grep gate_not_vendor_body "skills/local-diff-review-gate/SKILL.md" "useCanvasState\\(\"outbound\"\\).*FILES"
 
+assert_grep gate_loop_return "skills/local-diff-review-gate/SKILL.md" "next_skill: engineer-review"
+assert_grep gate_green_return "skills/local-diff-review-gate/SKILL.md" "next_skill: propose-commit"
+assert_no_grep gate_no_second_continue "skills/local-diff-review-gate/SKILL.md" "do not loop further|second answer is \`comment\` again.*continue"
+assert_grep gate_apply_dev "skills/local-diff-review-gate/SKILL.md" "csp-software-developer"
+assert_grep er_loop "skills/engineer-review/SKILL.md" "next_skill: engineer-review|Loop"
+assert_grep er_loop_miss "skills/engineer-review/SKILL.md" "local-diff-review-gate.*engineer-review|re-dispatch|again"
+assert_grep multi_loop "agents/csp-multi-repo-supervisor.md" "next_skill: engineer-review|Loop"
+assert_grep hitl_loop "skills/hitl-choice/references/presets.md" "engineer-review|Loop|next_skill: engineer-review"
+assert_grep propose_green "skills/propose-commit/SKILL.md" "approve-diff|next_skill: propose-commit|green|Loop"
+assert_grep flow_loop "docs/superpowers/pipeline-flow.md" "Loop|next_skill: engineer-review|approve-diff"
+assert_grep flow_html_loop "docs/superpowers/pipeline-flow.html" "Loop|local-diff-review-gate.*engineer-review|approve-diff"
+
 if [[ "$fail" -ne 0 ]]; then
   echo "SOME TESTS FAILED" >&2
   exit 1

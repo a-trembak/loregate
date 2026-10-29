@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Contract: before review-gate HITL, finish-plan must surface the work in the
-# human's client (checkout open folders + SetActiveBranch) so they can look at
-# the diff. This is an intermediate convenience step — not create-pr, not the
-# pipeline end. After skip/approve/done, engineer-review continues.
+# Contract: review-surface is branch checkout before thin HITL that starts
+# engineer-review; Local Diff canvas belongs to local-diff-review-gate after review.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 # shellcheck source=lib-assert.sh
@@ -47,14 +45,17 @@ assert_file "skills/create-pr/SKILL.md"
 assert_file "skills/software-developer/references/branch-setup.md"
 
 assert_grep finish_skill_ref "skills/finish-plan/SKILL.md" "review-surface.md"
-assert_grep finish_skill_local_diff "skills/finish-plan/SKILL.md" "local-diff-review.md"
 assert_grep finish_skill_before_hitl "skills/finish-plan/SKILL.md" "Apply review-surface"
 assert_grep finish_cmd_ref "commands/lgt-finish-plan.md" "review-surface.md"
-assert_grep finish_cmd_local_diff "commands/lgt-finish-plan.md" "local-diff-review.md"
 assert_grep finish_reask "skills/finish-plan/SKILL.md" "re-run review-surface"
 assert_grep finish_then_engineer "skills/finish-plan/SKILL.md" "csp-engineer-reviewer"
-assert_grep finish_outbound_fixes "skills/finish-plan/SKILL.md" "apply-fixes|local-diff-review/comments"
 assert_no_grep finish_no_surface_create "skills/finish-plan/SKILL.md" "mode:surface"
+
+# finish-plan must NOT build Local Diff canvas before engineer-review
+assert_no_grep finish_no_canvas_build "skills/finish-plan/SKILL.md" "review-local-diff|build-canvas"
+assert_grep finish_thin_prompt "skills/finish-plan/SKILL.md" "start engineer-review|After you answer, engineer-review"
+assert_grep finish_fixes_typed "skills/finish-plan/SKILL.md" "fixes"
+assert_no_grep finish_no_outbound_canvas "skills/finish-plan/SKILL.md" "local-diff-review/comments"
 
 assert_grep surface_set_active "skills/finish-plan/references/review-surface.md" "SetActiveBranch"
 assert_grep surface_checkout "skills/finish-plan/references/review-surface.md" "git( -C.*)? checkout"
@@ -70,8 +71,10 @@ assert_grep surface_never_finale "skills/finish-plan/references/review-surface.m
 assert_grep surface_uncommitted "skills/finish-plan/references/review-surface.md" "git status|uncommitted|working tree"
 assert_grep surface_no_placeholder "skills/finish-plan/references/review-surface.md" "placeholder commit|Do not.*placeholder"
 assert_grep surface_propose "skills/finish-plan/references/review-surface.md" "propose-commit"
-assert_grep surface_prefer_local_diff "skills/finish-plan/references/review-surface.md" "local-diff-review.md|review-local-diff"
 assert_grep surface_never_vendor "skills/finish-plan/references/review-surface.md" "Never vendor|do not vendor"
+
+assert_no_grep surface_no_prefer_canvas "skills/finish-plan/references/review-surface.md" "Prefer Local Diff Review canvas|prefer Local Diff Review canvas"
+assert_grep surface_no_canvas_before_er "skills/finish-plan/references/review-surface.md" "Do not.*Local Diff|not.*build.*canvas|local-diff-review-gate"
 
 assert_grep local_diff_skill_id "skills/finish-plan/references/local-diff-review.md" "review-local-diff"
 assert_grep local_diff_kind "skills/finish-plan/references/local-diff-review.md" "local-diff-review/comments"
@@ -86,6 +89,10 @@ assert_grep local_diff_no_vendor "skills/finish-plan/references/local-diff-revie
 assert_grep local_diff_new_chat_out_of_scope "skills/finish-plan/references/local-diff-review.md" "newComposerChat"
 assert_grep local_diff_out_of_scope_heading "skills/finish-plan/references/local-diff-review.md" "## Out of scope"
 
+# Protocol doc still exists but is for post-review gate
+assert_grep local_diff_when_post "skills/finish-plan/references/local-diff-review.md" "local-diff-review-gate"
+assert_no_grep local_diff_not_finish_hitl "skills/finish-plan/references/local-diff-review.md" "before engineer-review|Before engineer-review"
+
 assert_no_grep create_pr_no_surface "skills/create-pr/SKILL.md" "mode:surface"
 
 assert_grep branch_set_active "skills/software-developer/references/branch-setup.md" "SetActiveBranch"
@@ -93,9 +100,10 @@ assert_grep branch_open_folder "skills/software-developer/references/branch-setu
 assert_no_grep branch_no_draft_pr "skills/software-developer/references/branch-setup.md" "draft pull request"
 
 assert_grep rule_surface "rules/after-plan-review-gate.mdc" "review-surface|SetActiveBranch"
-assert_grep rule_local_diff "rules/after-plan-review-gate.mdc" "local-diff-review|Local Diff Review"
+assert_no_grep rule_no_canvas_before "rules/after-plan-review-gate.mdc" "Local Diff Review when available|prefer.*local-diff-review.md for uncommitted"
+assert_grep rule_thin "rules/after-plan-review-gate.mdc" "engineer-review starts after you answer|start engineer-review"
 assert_grep hook_surface "hooks/post-plan-review-gate.sh" "review-surface|SetActiveBranch"
-assert_grep hook_local_diff "hooks/post-plan-review-gate.sh" "review-local-diff|local-diff-review"
+assert_no_grep hook_no_canvas "hooks/post-plan-review-gate.sh" "review-local-diff|Local Diff Review canvas"
 assert_grep_start_task start_task_surface "review-surface|SetActiveBranch"
 assert_grep_start_task start_task_local_diff "local-diff-review|review-local-diff"
 assert_grep hitl_local_diff "skills/hitl-choice/references/presets.md" "local-diff-review|Current thread"
