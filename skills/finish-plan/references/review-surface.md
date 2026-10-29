@@ -2,7 +2,7 @@
 
 Intermediate convenience step: show the finished work in the human's Cursor client **before** asking `skip` / `approve` / `done` / `fixes`. This **does not end the pipeline**.
 
-The human looks at the merge-base diff (the pull request tab in Cursor) when commits exist on the feature branch; when the branch has **zero commits ahead of base** or only uncommitted work, they review the **working tree** via the pull request tab when possible, or chat when they ask. After `skip` / `approve` / `done`, **engineer-review** runs, then `propose-commit`, then `update-docs`, then `create-pr` (the real shipping draft). Do not open a GitHub pull request here.
+The human looks at the merge-base diff (the pull request tab in Cursor) when commits exist on the feature branch; when the branch has **zero commits ahead of base** or only uncommitted work, they review the **working tree** via the pull request tab when possible, or chat when they ask. After `skip` / `approve` / `done`, **engineer-review** runs, then Teach-review miss, then skill `local-diff-review-gate` (Loop on `comment` until `approve-diff`), then `propose-commit`, then `update-docs`, then `create-pr` (the real shipping draft). Do not open a GitHub pull request here.
 
 ## When
 
@@ -46,7 +46,7 @@ This is what shows the merge-base diff in the client's pull request tab. It is *
 
 Attempt the call. Do not skip because you are “unsure the tool exists”. If the tool is missing after a hard not-found, keep the `git checkout` and say in chat that the pull request tab could not be activated.
 
-Do **not** `git push`. Do **not** invoke skill `create-pr`. Do **not** run `gh pr create`. The shipping draft comes later, after engineer-review, `propose-commit`, and `update-docs`.
+Do **not** `git push`. Do **not** invoke skill `create-pr`. Do **not** run `gh pr create`. The shipping draft comes later, after engineer-review, Teach-review miss, `local-diff-review-gate`, `propose-commit`, and `update-docs`.
 
 ## 2b. Uncommitted change set (when ahead is empty)
 

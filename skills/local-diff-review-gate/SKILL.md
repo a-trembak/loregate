@@ -33,7 +33,7 @@ For **each** repo in map order:
 
 1. **Focus that repo only.** Prefer session tool `move_agent_to_root` (or equivalent) into that repo's absolute root. The canvas filename is shared — **never** open two Local Diff Review canvases at once.
 
-2. **Plugin missing:** if skill `review-local-diff` cannot be loaded / skill file missing → one sentence to the human, run-log note `skipped-missing-plugin`, continue to the next repo (or to `propose-commit` when done). Do not invent a canvas.
+2. **Plugin missing:** if skill `review-local-diff` cannot be loaded / skill file missing → one sentence to the human, run-log note `skipped-missing-plugin`, continue to the next repo (or return `next_skill: propose-commit` when all repos are done). Do not invent a canvas.
 
 3. **Clean tree:** if both `git diff HEAD` and `git diff --cached` are empty → skip quietly, run-log note `skipped-clean`, next repo.
 
