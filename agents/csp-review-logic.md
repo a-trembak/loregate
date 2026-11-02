@@ -84,3 +84,8 @@ Follow `skills/engineer-review/references/phase-protocol.md` and `phase-protocol
 ## Evidence
 
 Mandatory fields per `phase-protocol.md` + `evidence-gate.md` (path, lines, snippet, context; clarify `question`, `what`, `when_shows`, `options`). Return full evidence in the Task JSON — never truncate or keep the real write-up only inside the subagent.
+
+### Nested ScrollView + WebView (React Native)
+
+When triggered: **open the full checklist** `skills/engineer-review/references/rn-nested-scroll-checklist.md` and apply **W1**. Coverage must note `rn_nested_scroll: ok|nested|skipped|n/a` when this trigger applies.
+

@@ -33,6 +33,7 @@ Each heuristic subagent gets: SHAs, stack, patterns path, clarifications, mode, 
 
 - Never emit a finding without **Context**, File + Lines + Jump links **and** a real code fence (see `evidence-gate.md` at merge). Never emit Verdict/Blockers/Блокери digests (`forbidden-formats.md`). Path-only or “see file” is a hard failure. Never invent `recommended` when the phase left it null.
 - Never ask a clarify `C#` without repeating that item’s File, Lines, Jump, and numbered code fence in the question prompt (skill `hitl-choice` Engineer-review clarify). Jump path is not enough.
+- Never open Engineer-review clarify HITL when a loaded kit/project checklist, skill, or rule already mandates the fix — reclassify to Fixed per `auto-fix-eligibility.md` (Rule-mandated answers). Do not ask the human to reconfirm policy.
 - Never **re-summarize** phase clarify fields when merging or asking HITL — lift `context`, `what`, `when_shows`, `question`, `snippet`, and option labels **verbatim** from phase JSON. Incomplete phase returns → backfill or drop; never invent a batch letter-only ask (`C1: A; C2: B` as the only body).
 - Never emit unhumanized / jargon-only / abbreviated feedback or bare `path: summary` one-liners. Chat prose must pass `plain-language-chat`.
 - Always run `validate-review-report.sh` before showing the report; do not show on failure.

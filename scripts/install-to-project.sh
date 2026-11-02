@@ -329,6 +329,12 @@ sync_kit_entries_into() {
 # the agent workspace after lgt install.
 install_pipeline_canvas_user() {
   mkdir -p "$HOME/.cursor/pipeline-canvases"
+  # Replace a stale symlink-to-kit with a real file (cp onto a symlink to the
+  # same path fails on macOS with "identical" and would abort set -e before
+  # install_context_spend_status_extension).
+  if [[ -L "$HOME/.cursor/pipeline-canvases/pipeline-flow.html" ]]; then
+    rm -f "$HOME/.cursor/pipeline-canvases/pipeline-flow.html"
+  fi
   cp "$KIT_ROOT/docs/superpowers/pipeline-flow.html" "$HOME/.cursor/pipeline-canvases/pipeline-flow.html"
   echo "copied: $HOME/.cursor/pipeline-canvases/pipeline-flow.html"
 }
