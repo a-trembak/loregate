@@ -462,3 +462,88 @@ source: teach-review
 Mechanism: Excel and React styling/layout fixes (lighter gray, borders, graph mask opacity, palette pad, mobile footer order, attach spacing) invite hex-/stylesheet-/`sx`-/DOM-order-pinning tests that churn on every design tweak and do not protect domain rules (when to gray a row or show an offline band, omit a column, treat online=0, mutation payloads, guards). Consumer `testing-conventions` that still showcase `describe("rendering")` must not override T1.
 
 Required check: [business-logic-tests-checklist.md](business-logic-tests-checklist.md) **T1** (explicitly includes React / Jest / Testing Library).
+### `miss_ordered-fallback-primary-first`
+
+```yaml
+id: miss_ordered-fallback-primary-first
+miss_class: ordered-fallback-primary-first
+triggers:
+  - fallback | locale A then B | catalog primary then secondary
+  - translation key-set | empty stub translator | hasPrimaryEntry
+  - dialog host | installation type | page context forces secondary
+  - secondary wins while primary entry exists
+phases: [logic]
+gate: OF1
+rule_one_liner: >-
+  When an ordered fallback prefers primary then secondary, secondary may
+  win only if primary has no real entry — never via empty primary stubs,
+  page context, or installation/device type while primary exists.
+anti_pattern: >-
+  Empty primary stub so secondary always wins on secondary pages; or
+  choosing a secondary dialog/host from installation type while a primary
+  translation/entry still exists.
+hits: 1
+last_seen: 2026-09-15
+source: teach-review
+```
+
+Mechanism: review accepts forcing the secondary catalog/locale/host because of page or installation context, even though the product rule is primary-first and secondary is only a gap-fill.
+
+Required check: [ordered-fallback-primary-first-checklist.md](ordered-fallback-primary-first-checklist.md) **OF1**.
+### `miss_iframe-pdf-paging-related-variants`
+
+```yaml
+id: miss_iframe-pdf-paging-related-variants
+miss_class: iframe-pdf-paging-related-variants
+triggers:
+  - WebView | react-native-webview
+  - iframe PDF | embed PDF | paginated document
+  - legal | terms | privacy | help HTML URL
+  - sibling web renderer | HTML vs PDF iframe
+phases: [logic]
+gate: D1
+also: [D2]
+rule_one_liner: >-
+  When a native WebView hosts a page that can embed a PDF in an iframe,
+  review multi-page scroll/paging and iframe height, and chase related
+  repository document variants (HTML vs PDF, short vs long) — not only
+  the diff fixture.
+anti_pattern: >-
+  Approving after a single-page iframe or short HTML fixture while a sibling
+  renderer can serve a multi-page PDF in an iframe whose later pages are
+  clipped or unscrollable.
+hits: 1
+last_seen: 2026-09-11
+source: teach-review
+```
+
+Mechanism: review closes after the native wrapper and one HTML or single-page iframe fixture. The related web renderer still injects a multi-page PDF in an iframe; later pages never enter the WebView viewport.
+
+Required check: [iframe-document-paging-checklist.md](iframe-document-paging-checklist.md) **D1–D2**. Distinct from nested `ScrollView` + `WebView` pan stealing.
+### `miss_webview-nested-in-scrollview`
+
+```yaml
+id: miss_webview-nested-in-scrollview
+miss_class: webview-nested-in-scrollview
+triggers:
+  - WebView | react-native-webview
+  - ScrollView wrapping WebView | nestedScrollEnabled
+  - flex: 1 WebView inside ScrollView
+  - full-screen HTML document in-app
+phases: [logic]
+gate: W1
+rule_one_liner: >-
+  On React Native, a full-screen WebView must be the only vertical scroller;
+  do not wrap it in ScrollView. Regression must assert no ScrollView ancestor.
+anti_pattern: >-
+  Nesting WebView inside ScrollView with both flex: 1 so the outer scroller
+  steals the pan gesture and long HTML cannot scroll; treating
+  nestedScrollEnabled as sufficient while the parent scroller remains.
+hits: 1
+last_seen: 2026-09-10
+source: teach-review
+```
+
+Mechanism: review accepts a laid-out WebView inside ScrollView because the page renders. On device the outer scroller owns the pan, so long HTML never moves. Structural tests that only assert a WebView exists miss the ancestor.
+
+Required check: [rn-nested-scroll-checklist.md](rn-nested-scroll-checklist.md) **W1**.

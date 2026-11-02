@@ -17,3 +17,6 @@ grep -q 'loregate-pipeline-status.canvas.tsx' "$ROOT/extensions/context-spend-st
 grep -q 'Canvas' "$ROOT/docs/superpowers/specs/2026-10-29-pipeline-status-webview-panel-design.md"
 grep -q 'ext_src/media' "$ROOT/scripts/install-to-project.sh"
 echo "ALL PASS"
+# Stale symlink under ~/.cursor/pipeline-canvases must be removed before cp (macOS identical).
+grep -q 'pipeline-canvases/pipeline-flow.html' "$ROOT/scripts/install-to-project.sh"
+grep -q '\-L "$HOME/.cursor/pipeline-canvases/pipeline-flow.html"' "$ROOT/scripts/install-to-project.sh"

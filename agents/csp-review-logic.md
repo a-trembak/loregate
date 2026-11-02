@@ -57,11 +57,24 @@ When triggered: **open the full checklist** `skills/engineer-review/references/j
 
 When triggered: **open the full checklist** `skills/engineer-review/references/null-safety-checklist.md` and apply **N1**. Coverage must note `null_safety_callers: traced|partial|skipped|n/a` when this trigger applies.
 
+
+### Ordered fallback — primary first (OF1, when triggered)
+
+**Trigger:** the diff builds or changes an ordered fallback between a primary and secondary catalog / locale / translation key-set / dialog host, **or** selects host/resolver by installation type, page context, device family, or an empty/stub primary translator.
+
+When triggered: **open the full checklist** `skills/engineer-review/references/ordered-fallback-primary-first-checklist.md` and apply **OF1**. Coverage must note `ordered_fallback: primary-first|reversed|skipped|n/a` when this trigger applies.
+
 ### Empty-collection fail-close (FC1, when triggered)
 
 **Trigger:** the diff short-circuits on an empty or absent upstream collection (`Optional.empty()`, null/absent response, empty list/map) **or** walks nested children of that collection, **and** also adds (or plans to add) a scoped, current-context, or other fallback candidate to the result.
 
 When triggered: **open the full checklist** `skills/engineer-review/references/empty-collection-fail-close-checklist.md` and apply **FC1**. Coverage must note `empty_fail_close: both-shapes|one-shape|skipped|n/a` when this trigger applies.
+
+### Iframe-hosted document paging (D1–D2, when triggered)
+
+**Trigger:** a native WebView (or equivalent) loads a remote/local HTML URL, **or** the hosted page (this repo or a related/sibling renderer) embeds a PDF or other paginated document in an iframe.
+
+When triggered: **open the full checklist** `skills/engineer-review/references/iframe-document-paging-checklist.md` and apply **D1–D2**. Coverage must note `iframe_document_paging: paging+variants|one-shape|skipped|n/a` when this trigger applies. Distinct from nested native `ScrollView` + `WebView` (outer scroller steals pan).
 
 ## Output
 
@@ -71,3 +84,8 @@ Follow `skills/engineer-review/references/phase-protocol.md` and `phase-protocol
 ## Evidence
 
 Mandatory fields per `phase-protocol.md` + `evidence-gate.md` (path, lines, snippet, context; clarify `question`, `what`, `when_shows`, `options`). Return full evidence in the Task JSON — never truncate or keep the real write-up only inside the subagent.
+
+### Nested ScrollView + WebView (React Native)
+
+When triggered: **open the full checklist** `skills/engineer-review/references/rn-nested-scroll-checklist.md` and apply **W1**. Coverage must note `rn_nested_scroll: ok|nested|skipped|n/a` when this trigger applies.
+
