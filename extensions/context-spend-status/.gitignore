@@ -1,2 +1,5 @@
 node_modules/
 out/
+.tmp-canvas-tests/
+.tmp-canvas-tests/
+.tmp-canvas-preview.tsx

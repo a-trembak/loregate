@@ -359,7 +359,8 @@ install_context_spend_status_extension() {
     return 0
   fi
   ext_ver="$(python3 -c 'import json;print(json.load(open("'"$ext_src"'/package.json"))["version"])')"
-  ext_dest="$HOME/.cursor/extensions/loregate-context-spend-status-$ext_ver"
+  # Cursor/VS Code loads ~/.cursor/extensions/<publisher>.<name>-<version>/
+  ext_dest="$HOME/.cursor/extensions/loregate.loregate-context-spend-status-$ext_ver"
 
   # Always recompile so git pull + lgt install does not leave stale out/.
   if ! (cd "$ext_src" && npm install --no-fund --no-audit && npm run compile); then
@@ -377,8 +378,12 @@ install_context_spend_status_extension() {
   cp "$ext_src/package.json" "$ext_dest/"
   cp "$ext_src/README.md" "$ext_dest/" 2>/dev/null || true
   cp -R "$ext_src/out" "$ext_dest/out"
+  if [[ -d "$ext_src/media" ]]; then
+    cp -R "$ext_src/media" "$ext_dest/media"
+  fi
   echo "copied: $ext_dest"
-  echo "hint: Reload Window to enable Loregate Context Spend status bar (Agent Window / IDE)"
+  echo "hint: Reload Window, then open Agent Window canvas loregate-pipeline-status.canvas.tsx"
+  echo "hint: if the canvas clock freezes in Agent Window, run: bash \"$KIT_ROOT/scripts/pipeline-map-canvas-watch.sh\" --root <project>"
 }
 
 

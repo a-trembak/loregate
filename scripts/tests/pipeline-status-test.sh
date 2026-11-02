@@ -133,6 +133,29 @@ ps_use_root "$CLR_ORPHAN"
 clr_orphan_json="$("$SCRIPT" --json --root "$CLR_ORPHAN")"
 assert_eq critique_clear_orphan_false "False" "$(json_field "$clr_orphan_json" 'd["critique_clear"]')"
 
+# --- Fixture: stale plan-family ledger + newer plan-critique-clear → start-build ---
+STALE_CLR="$TMP/stale-clear-advance"
+mkdir -p "$STALE_CLR/gates/plan-critique-clear" "$STALE_CLR/gates/trajectory-run"
+cat >"$STALE_CLR/gates/trajectory-run/session-full.json" <<'EOF'
+{
+  "case_id": "full-happy-path",
+  "stages_entered": ["csp-tech-spec", "writing-plans"],
+  "artifacts_present": [],
+  "actions_taken": [],
+  "human_gates_asked": [],
+  "end": {}
+}
+EOF
+# Make ledger look older than the clear marker
+touch -t 202610211200 "$STALE_CLR/gates/trajectory-run/session-full.json"
+printf '%s\n' "docs/plans/demo.md" >"$STALE_CLR/gates/plan-critique-clear/DEMO"
+touch -t 202611021452 "$STALE_CLR/gates/plan-critique-clear/DEMO"
+ps_use_root "$STALE_CLR"
+stale_clr_json="$("$SCRIPT" --json --root "$STALE_CLR")"
+assert_eq stale_clear_stage "start-build" "$(json_field "$stale_clr_json" 'd["stage"]')"
+assert_eq stale_clear_layer "build" "$(json_field "$stale_clr_json" 'd["layer"]')"
+assert_eq stale_clear_entered_has_build "True" "$(json_field "$stale_clr_json" '"start-build" in d["stages_entered"]')"
+
 # --- Fixture: matching clear for active pending plan → critique_clear true ---
 CLR_MATCH="$TMP/clear-match"
 mkdir -p "$CLR_MATCH/gates/review-gate" "$CLR_MATCH/gates/plan-critique-clear"

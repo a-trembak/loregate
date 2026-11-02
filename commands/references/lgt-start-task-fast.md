@@ -9,8 +9,8 @@ Load **only after** mode selection chose **fast**. For small tasks that do not n
 3. **Short task brief** (automatic, in chat only — not a tech-spec file): 3–6 bullets covering goal, touched areas if obvious, and done criteria from the AC. Do not run `tech-spec`, `writing-plans`, `approve-plan`, or `implementation-critic`. Optionally `pipeline-run-log.sh brief-upsert --root <project> --invocation <invocation_id> --route fast --goal "<one line>" --next "csp-software-developer"` (short brief under `.cursor/gates/run-log/briefs/` — not a fake plan under `docs/`). Do **not** require promote on fast/tiny runs.
 4. **Execute** — create feature branch(es) per `software-developer` branch-setup; implement with skill **`software-developer`** via nested Task **`csp-software-developer`** using **`mode:fast`** (entry gates for tech-spec Status / critique-clear are skipped — see that skill). Prefer `subagent-driven-development` when available; verify with lint/test/typecheck before handoff. **Wait for** `csp-software-developer` to return. Do not treat dispatch as the end.
 5. **Engineer review** — immediately after that return, run `csp-engineer-reviewer` (or `csp-multi-repo-supervisor` for 2+ repos). Skip `finish-plan` HITL. Skip Figma ask unless node URLs were already in the AC/context. HITL only for **Needs clarification**.
-5b. **Local Diff Review gate** — invoke skill **`local-diff-review-gate`**.
-5c. **Propose commit** — invoke skill **`propose-commit`**.
+5b. **Local Diff Review gate** — invoke skill **`local-diff-review-gate`**. If the gate returns **`next_skill: engineer-review`**, re-run engineer-review and Teach-review miss, then skill **`local-diff-review-gate`** again (**Loop** until the gate returns **`next_skill: propose-commit`**).
+5c. **Propose commit** — invoke skill **`propose-commit`** only after the local-diff gate returns **`next_skill: propose-commit`**.
 6. **Create PR** — invoke skill **`create-pr`** (push + draft + Pipeline finale). Do not expect `create-pr` to invent product commits.
 
 ## Fast-mode notes

@@ -56,7 +56,7 @@ For **each** repo in the map, after checkout, note whether `git rev-list --count
 
 ### No Local Diff canvas here
 
-Do **not** run skill `review-local-diff` or build the Local Diff Review canvas during finish-plan. Human canvas review belongs to skill `local-diff-review-gate` after engineer-review. For zero-ahead / uncommitted trees, the pull request tab may be empty — that is expected; do not paste a full `git diff` unless the human asks. After `skip` / `approve` / `done`, engineer-review runs.
+Do **not** run skill `review-local-diff` or build the Local Diff Review canvas during finish-plan. Human local-change review belongs to skill `local-diff-review-gate` after engineer-review (**Local Git Changes** first; plugin canvas optional). For zero-ahead / uncommitted trees, the pull request tab may be empty — that is expected; do not paste a full `git diff` unless the human asks. After `skip` / `approve` / `done`, engineer-review runs.
 
 ## 3. Then ask HITL — pipeline continues
 

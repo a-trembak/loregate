@@ -81,7 +81,7 @@ Two places: **Cursor user dir** (`~/.cursor`) and **the project**.
 | `~/.cursor/rules/ui-explanations-human-language.mdc` | Copied / refreshed — UI bugs and screen choices name what the human sees, not component props |
 | `~/.cursor/rules/backend-logic-explanations-human-language.mdc` | Copied / refreshed — backend bugs and logic choices name the business outcome first, not layer jargon |
 | `~/.cursor/statusline-loregate.sh` | Copied / refreshed — optional Cursor Agent CLI two-line context-spend status (enable in `cli-config.json`; see below) |
-| `~/.cursor/extensions/loregate-context-spend-status-<version>/` | Copied / refreshed — IDE status bar context-spend proxies (Reload Window after install; see below) |
+| `~/.cursor/extensions/loregate.loregate-context-spend-status-<version>/` | Copied / refreshed — Pipeline Map Agent Window Canvas + Webview + optional status chip (Reload Window; open `loregate-pipeline-status.canvas.tsx` or Command Palette → **Loregate: Show Pipeline Map**) |
 | `~/.cursor/cursor-spells-kit-path` | Text file with absolute path to this kit checkout |
 | `~/.cursor/cursor-spells-learn.json` | Created if missing — `land` (`draft_merge` default / `auto_push`); never overwritten on update |
 | `~/.cursor/lgt-policy-accepted` | Written on every install/update after public policy agreement (`accepted_at`, `agree_via`, `policy_hash`, …) |
@@ -129,7 +129,7 @@ Full behavior, snapshot rules, and stage mapping: [`docs/superpowers/specs/2026-
 
 ### IDE context-spend status bar (Agent Window)
 
-Install copies the compiled extension from `extensions/context-spend-status/` to `~/.cursor/extensions/loregate-context-spend-status-<version>/` (package manifest, README, and `out/` only). **Reload Window** once after install or update so Cursor loads it.
+Install copies the compiled extension from `extensions/context-spend-status/` to `~/.cursor/extensions/loregate.loregate-context-spend-status-<version>/` (package manifest, README, `out/`, and `media/`). **Reload Window** once after install or update. Primary UX for Agent Window: the extension rewrites `~/.cursor/projects/<workspace-id>/canvases/loregate-pipeline-status.canvas.tsx` from `pipeline-status.sh` with no agent tokens (also `scripts/pipeline-map-canvas.sh`). Secondary: Command Palette → **Loregate: Show Pipeline Map** (Webview). Design: [`docs/superpowers/specs/2026-10-29-pipeline-status-webview-panel-design.md`](docs/superpowers/specs/2026-10-29-pipeline-status-webview-panel-design.md).
 
 The status bar shows the same pipeline proxies as the CLI status line (`pipe …`, peak, ⚠ threshold) for Agent Window users. Click the item to open an Output channel with drill-down text.
 
@@ -215,7 +215,7 @@ evals/       Kit-only golden sets (trajectories, harness reports, code-quality) 
 | [`english-humanizer`](skills/english-humanizer/) | Strip AI tells from English bug reports, colleague messages, and PR comments |
 | [`plain-language-chat`](skills/plain-language-chat/) | User-facing chat uses full words and full sentences in the **selected pipeline language** — no abbreviations or telegram fragment stacks; always-on via rule `plain-language-chat` |
 | [`finish-plan`](skills/finish-plan/) | Plan→HITL handoff: thin `review-surface` (`SetActiveBranch` + checkout) then review-gate; **no** Local Diff canvas here — engineer-review runs next, then `local-diff-review-gate` |
-| [`local-diff-review-gate`](skills/local-diff-review-gate/) | Pipeline-only HITL before `propose-commit` — Local Diff Review canvas (`approve-diff` / `comment`); applies comments; never commits or opens a pull request |
+| [`local-diff-review-gate`](skills/local-diff-review-gate/) | Pipeline-only HITL before `propose-commit` — **Local Git Changes** first (`approve-diff` / `comment`); Local Diff Review plugin canvas optional; never commits or opens a pull request |
 | [`propose-commit`](skills/propose-commit/) | Post-review HITL — propose commit message + file list; `approve-commit` / `revise`; `git commit` only (never push); writes `commit-approved` gate |
 | [`update-docs`](skills/update-docs/) | Post-review HITL — product docs destination (`docs/` / docs repo / Confluence) + dual-audience writing |
 | [`engineer-review`](skills/engineer-review/) | Multi-phase review orchestrator — snippets + file links + humanizer prose; P0–P2, chunking |
@@ -273,9 +273,9 @@ npx skills add everyinc/compound-engineering-plugin@ce-test-browser
 npx skills add graphify-labs/graphify@graphify
 # PR Review Canvas (Cursor plugin — not npx): install "PR Review Canvas" / pr-review-canvas
 # so /lgt-pr-review can emit a diff-orientation canvas (skip with no-canvas)
-# Local Diff Review (Cursor plugin — not npx): install "Local Diff Review" / local-diff-review
-# so skill local-diff-review-gate can show uncommitted diffs in an Agent Window canvas after engineer-review
-# (skill review-local-diff; escape with no-local-diff-review; chat git diff remains fallback at review-gate)
+# Local Diff Review plugin is OPTIONAL. Pipeline local-diff-review-gate prefers Cursor Local Git Changes
+# (SetActiveBranch). Install "Local Diff Review" / local-diff-review only if you want the Agent Window canvas
+# on explicit ask (skill review-local-diff; escape with no-local-diff-review).
 # Database: always-on + current MySQL/MongoDB stack (same ids as skill-map Database skill routing).
 # Conditional Postgres/Flyway/Prisma stay manual unless the consumer project uses them.
 npx skills add wshobson/agents@database-migration
@@ -306,7 +306,7 @@ When `graphify-out/` exists (or `graphify query` answers), the pipeline uses gra
 
 ### review-gate → HITL → engineer review
 
-1. When coding from a plan is done: `/lgt-finish-plan` (this is the **review-gate** HITL, not another planning step). First it applies thin [`review-surface`](skills/finish-plan/references/review-surface.md): check out the feature branch in each open folder and call `SetActiveBranch` so the pull request tab can show the branch diff. That is **not** a GitHub pull request and **not** the pipeline end. **This gate does not open the Local Diff Review canvas** — that comes later via [`local-diff-review-gate`](skills/local-diff-review-gate/) after engineer-review and Teach-review miss. When the tab is empty (zero commits ahead of base), chat (`git status` / `git diff`) may summarize the uncommitted tree.
+1. When coding from a plan is done: `/lgt-finish-plan` (this is the **review-gate** HITL, not another planning step). First it applies thin [`review-surface`](skills/finish-plan/references/review-surface.md): check out the feature branch in each open folder and call `SetActiveBranch` so the pull request tab can show the branch diff. That is **not** a GitHub pull request and **not** the pipeline end. **This gate does not open Local Diff Review** — that comes later via [`local-diff-review-gate`](skills/local-diff-review-gate/) after engineer-review and Teach-review miss (**Local Git Changes** first; plugin canvas optional). When the tab is empty (zero commits ahead of base), chat (`git status` / `git diff`) may summarize the uncommitted tree.
 2. Answer via interactive buttons when offered (`AskQuestion`), or type `skip` / `approve` / `done`. Type `fixes` to return to `csp-software-developer`, then the same gate. After `skip` / `approve` / `done`, **engineer-review** starts.
 3. On frontend, use the Figma picker or paste node URLs / `no figma`
 4. Orchestrator runs phases; applies **P0/P1** unambiguous fixes; lists clarifications separately
@@ -331,7 +331,7 @@ On every `revise` of a spec or plan, agents follow [`clean-decision-docs`](skill
 5. Executes via `csp-software-developer` (branch setup in target repo(s) → skill-map routing + Skill profile → `subagent-driven-development`) — automatic, no "which approach?" prompt in this flow
 6. `review-gate` via `/lgt-finish-plan` — thin surface (`SetActiveBranch` + checkout) then **HITL** `skip`/`approve`/`done` (or `fixes` back to `csp-software-developer`). **No** Local Diff canvas at this gate. Pipeline continues.
 7. `engineer-review` — phases honor Skill profile for L2; optional tiny-diff phase skip; **HITL** only for clarifications it raises; then Teach-review miss
-7b. [`local-diff-review-gate`](skills/local-diff-review-gate/) — **HITL** `approve-diff` / `comment` (Local Diff Review canvas after review; **Loop** on `comment` until `approve-diff`; skip if clean / missing plugin)
+7b. [`local-diff-review-gate`](skills/local-diff-review-gate/) — **HITL** `approve-diff` / `comment` (Local Git Changes after review; plugin canvas optional; **Loop** on `comment` until `approve-diff`; skip if clean)
 8. [`propose-commit`](skills/propose-commit/) — **HITL** `approve-commit` / `revise`; stages listed paths and `git commit` only (never push); writes `.cursor/gates/commit-approved/<slug>`
 9. `/lgt-update-docs` — **HITL** `skip` / `docs_md` / `docs_repo` / `confluence` (product docs destination; dual-audience write); residual **`propose-commit`** if docs left uncommitted files
 10. `/create-pr` skill — **always draft first**, then HITL **Pipeline finale**: `keep_draft` / `ready` (`gh pr ready`), and `keep_draft_jira` / `ready_jira` when a Jira key is known (comment PR URL on the ticket). `ready` / `ready_jira` move the Jira issue to **Review** only after every opened pull request is merged and every continuous-integration build succeeded. Never merge.

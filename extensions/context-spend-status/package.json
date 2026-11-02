@@ -1,7 +1,8 @@
 {
   "name": "loregate-context-spend-status",
-  "displayName": "Loregate Context Spend",
-  "version": "0.0.1",
+  "displayName": "Loregate Pipeline Status",
+  "description": "Pipeline map Webview and context-spend status for Loregate",
+  "version": "0.3.2",
   "publisher": "loregate",
   "engines": {
     "vscode": "^1.85.0"
@@ -18,8 +19,31 @@
       {
         "command": "loregate.contextSpend.show",
         "title": "Loregate: Show Context Spend"
+      },
+      {
+        "command": "loregate.pipelineMap.show",
+        "title": "Loregate: Show Pipeline Map",
+        "icon": "$(map)"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "loregate",
+          "title": "Loregate",
+          "icon": "media/loregate.svg"
+        }
+      ]
+    },
+    "views": {
+      "loregate": [
+        {
+          "type": "webview",
+          "id": "loregate.pipelineMap",
+          "name": "Pipeline Map"
+        }
+      ]
+    }
   },
   "scripts": {
     "compile": "tsc -p .",

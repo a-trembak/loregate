@@ -4,6 +4,13 @@ import os from "node:os";
 import path from "node:path";
 import { formatOutput, formatStatusText } from "./format";
 import { hintForStage } from "./hints";
+import {
+  focusPipelineMapView,
+  getPipelineMapViewType,
+  PipelineMapViewProvider,
+  revealOrCreatePipelineMapPanel,
+  updatePipelineMapSurfaces,
+} from "./pipelineMapPanel";
 import { fetchPipelineOrientation } from "./pipelineStatus";
 import { pickWorkspaceFolder } from "./resolveFolder";
 import {
@@ -11,14 +18,30 @@ import {
   loadSnapshots,
   metricsForSession,
 } from "./snapshots";
+import { buildPipelineTree, type PipelineTree } from "./treeModel";
+import {
+  sealLegacyPipelineMapCanvas,
+  writePipelineMapCanvas,
+} from "./writePipelineMapCanvas";
 
-const COMMAND = "loregate.contextSpend.show";
+const SHOW_SPEND_COMMAND = "loregate.contextSpend.show";
+const SHOW_MAP_COMMAND = "loregate.pipelineMap.show";
 const REFRESH_INTERVAL_MS = 3000;
 
 let refreshTimer: NodeJS.Timeout | undefined;
 let statusItem: vscode.StatusBarItem | undefined;
 let outputChannel: vscode.OutputChannel | undefined;
 let registeredDisposables: vscode.Disposable[] = [];
+let lastTree: PipelineTree = emptyTree();
+let lastCanvasPath: string | undefined;
+
+function syncPipelineMapCanvas(root: string, tree: PipelineTree): void {
+  sealLegacyPipelineMapCanvas(root, os.homedir());
+  const written = writePipelineMapCanvas(root, os.homedir(), tree);
+  if (written !== null) {
+    lastCanvasPath = written;
+  }
+}
 
 export function activate(context: vscode.ExtensionContext): void {
   statusItem = vscode.window.createStatusBarItem(
@@ -30,10 +53,34 @@ export function activate(context: vscode.ExtensionContext): void {
   let lastOutput = unavailableOutput("");
   let refreshInFlight = false;
 
-  const showOutput = vscode.commands.registerCommand(COMMAND, () => {
+  const mapProvider = new PipelineMapViewProvider(
+    context.extensionUri,
+    lastTree
+  );
+
+  const showOutput = vscode.commands.registerCommand(SHOW_SPEND_COMMAND, () => {
     outputChannel?.replace(lastOutput);
     outputChannel?.show(true);
   });
+
+  const showMap = vscode.commands.registerCommand(
+    SHOW_MAP_COMMAND,
+    async () => {
+      await refresh();
+      revealOrCreatePipelineMapPanel(lastTree, context.extensionUri);
+      await focusPipelineMapView();
+      if (lastCanvasPath !== undefined) {
+        try {
+          const doc = await vscode.workspace.openTextDocument(
+            vscode.Uri.file(lastCanvasPath)
+          );
+          await vscode.window.showTextDocument(doc, { preview: true });
+        } catch {
+          // Canvas open is best-effort; Webview panel remains available.
+        }
+      }
+    }
+  );
 
   const refresh = async (): Promise<void> => {
     if (refreshInFlight || statusItem === undefined) {
@@ -57,6 +104,13 @@ export function activate(context: vscode.ExtensionContext): void {
         })}`;
         statusItem.tooltip = "No workspace folder with Loregate gates is open.";
         lastOutput = unavailableOutput("");
+        lastTree = emptyTree("No workspace folder with Loregate gates is open.");
+        updatePipelineMapSurfaces(lastTree);
+        const fallbackRoot =
+          vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (fallbackRoot !== undefined) {
+          syncPipelineMapCanvas(fallbackRoot, lastTree);
+        }
         return;
       }
 
@@ -76,6 +130,9 @@ export function activate(context: vscode.ExtensionContext): void {
         statusItem.text = "$(dashboard) pipe — (unavailable)";
         statusItem.tooltip = `Loregate pipeline status is unavailable: ${orientation.error}`;
         lastOutput = unavailableOutput(snapshotsPath);
+        lastTree = emptyTree(orientation.error);
+        updatePipelineMapSurfaces(lastTree);
+        syncPipelineMapCanvas(root, lastTree);
         return;
       }
 
@@ -116,6 +173,17 @@ export function activate(context: vscode.ExtensionContext): void {
         hint,
         snapshotsPath,
       });
+
+      lastTree = buildPipelineTree({
+        route: orientation.route,
+        layer: orientation.layer,
+        stage: orientation.stage,
+        stagesEntered: orientation.stagesEntered,
+        pendingGates: orientation.pendingGates,
+        hasPipeline: orientation.hasPipeline,
+      });
+      updatePipelineMapSurfaces(lastTree);
+      syncPipelineMapCanvas(root, lastTree);
     } finally {
       refreshInFlight = false;
     }
@@ -125,16 +193,28 @@ export function activate(context: vscode.ExtensionContext): void {
     void refresh();
   });
 
-  statusItem.command = COMMAND;
+  const viewRegistration = vscode.window.registerWebviewViewProvider(
+    getPipelineMapViewType(),
+    mapProvider
+  );
+
+  statusItem.command = SHOW_MAP_COMMAND;
   statusItem.text = "$(dashboard) pipe — (no gates)";
-  statusItem.tooltip = "Loregate context spend is loading.";
+  statusItem.tooltip = "Loregate pipeline map is loading. Select to open the map.";
   statusItem.show();
 
   refreshTimer = setInterval(() => {
     void refresh();
   }, REFRESH_INTERVAL_MS);
 
-  registeredDisposables = [statusItem, outputChannel, showOutput, workspaceListener];
+  registeredDisposables = [
+    statusItem,
+    outputChannel,
+    showOutput,
+    showMap,
+    workspaceListener,
+    viewRegistration,
+  ];
   context.subscriptions.push(...registeredDisposables);
   void refresh();
 }
@@ -171,7 +251,7 @@ function tooltip(
   return [
     `Peak context spend: ${peak}`,
     `Hint: ${hint ?? "—"}`,
-    "Select to open Loregate Context Spend output.",
+    "Select to open Loregate Pipeline Map.",
   ].join("\n");
 }
 
@@ -184,5 +264,17 @@ function unavailableOutput(snapshotsPath: string): string {
     peakPp: null,
     hint: null,
     snapshotsPath,
+  });
+}
+
+function emptyTree(error?: string): PipelineTree {
+  return buildPipelineTree({
+    route: "unknown",
+    layer: "idle",
+    stage: "idle",
+    stagesEntered: [],
+    pendingGates: [],
+    hasPipeline: false,
+    error,
   });
 }

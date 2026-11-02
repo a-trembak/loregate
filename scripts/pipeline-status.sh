@@ -95,6 +95,63 @@ ps__route_from_ledger() {
   esac
 }
 
+ps__is_plan_family_stage() {
+  case "$1" in
+    bootstrap|csp-tech-spec|writing-plans|approve-plan|csp-implementation-critic|plan-gate|critique-gate|clean-decision-docs|issue-fix-plan)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+# Newest plan-critique-clear marker: mtime_epoch<TAB>plan_path<TAB>file
+# Prefer primary/fallback read paths — do not require pg_gates_base write probes.
+ps__newest_plan_critique_clear() {
+  local f m newest="" newest_mtime=0 plan dir
+  local -a dirs=()
+  dirs+=("$(pg__primary_gates_base "$PS_ROOT")/plan-critique-clear")
+  if dir="$(pg__fallback_gates_base "$PS_ROOT" 2>/dev/null)"; then
+    dirs+=("$dir/plan-critique-clear")
+  fi
+  if dir="$(pg_gates_base "$PS_ROOT" 2>/dev/null)"; then
+    dirs+=("$dir/plan-critique-clear")
+  fi
+  for dir in "${dirs[@]}"; do
+    [[ -d "$dir" ]] || continue
+    for f in "$dir"/*; do
+      [[ -f "$f" ]] || continue
+      m="$(stat -f %m "$f" 2>/dev/null || stat -c %Y "$f" 2>/dev/null)" || continue
+      if [[ "$m" -gt "$newest_mtime" ]]; then
+        newest_mtime="$m"
+        newest="$f"
+      fi
+    done
+  done
+  [[ -n "$newest" ]] || return 1
+  plan="$(head -n 1 "$newest" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+  [[ -n "$plan" ]] || return 1
+  printf '%s\t%s\t%s\n' "$newest_mtime" "$plan" "$newest"
+}
+
+# When agents write plan-critique-clear but forget to append the session ledger,
+# orientation stays stuck on writing-plans. Advance to start-build only when the
+# clear marker is newer than the ledger file (ledger is stale relative to gates).
+ps__advance_stale_plan_ledger() {
+  local stage="$1" ledger_path="$2"
+  local clear_mtime clear_plan clear_file ledger_mtime
+  ps__is_plan_family_stage "$stage" || return 1
+  [[ -n "$ledger_path" && -f "$ledger_path" ]] || return 1
+  IFS=$'\t' read -r clear_mtime clear_plan clear_file < <(ps__newest_plan_critique_clear) || return 1
+  ledger_mtime="$(stat -f %m "$ledger_path" 2>/dev/null || stat -c %Y "$ledger_path" 2>/dev/null)" || return 1
+  if [[ "$clear_mtime" -gt "$ledger_mtime" ]]; then
+    printf '%s' "start-build"
+    return 0
+  fi
+  return 1
+}
+
 ps__layer_for_stage() {
   local stage="$1"
   case "$stage" in
@@ -376,6 +433,16 @@ ps__build_record() {
     stage="idle"
   fi
   [[ -n "$stage" ]] || stage="idle"
+
+  # Stale ledger vs fresher plan-critique-clear (no pending human gate).
+  if [[ -z "${pending_kind:-}" ]]; then
+    if advanced="$(ps__advance_stale_plan_ledger "$stage" "$ledger_path")"; then
+      stage="$advanced"
+      stages_json="$(python3 -c 'import json,sys; s=json.loads(sys.argv[1]); a=sys.argv[2];
+print(json.dumps(s if a in s else s+[a]))' "$stages_json" "$stage")"
+    fi
+  fi
+
   layer="$(ps__layer_for_stage "$stage")"
 
   # critique_clear: plan-critique-clear for the active pending plan path when known
