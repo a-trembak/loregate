@@ -439,24 +439,26 @@ miss_class: tests-business-logic-only
 triggers:
   - unit test | assertEquals hex | fillColor | borderStyle | styles.xml
   - presentation constant | OFFLINE_ROW_FILL | fontSize | opacity
-  - "add test for" color | border | styling tweak
+  - "add test for" color | border | styling tweak | mobile footer | attach spacing | layout
   - toHaveStyle | sx= | markArea | rgba( | Emotion snapshot | className string
   - React Testing Library | *.test.tsx | transformDataForCharts palette
+  - footer order | icon-only attach | avatar beside | padding | gap | minHeight chrome
 phases: [logic, simplify]
 gate: T1
 rule_one_liner: >-
   Backend and frontend unit tests cover business decisions only; do not add
-  or demand tests that only pin presentation constants (colors, borders,
-  fonts, sx, chart chrome) or cosmetic XML/snapshots.
+  or demand tests that only pin presentation constants, layout chrome
+  (footer order, spacing, avatar placement), or cosmetic XML/snapshots.
 anti_pattern: >-
   Writer adds fillColorIsF0F0F0 / thinBorder style XML tests, or frontend
-  expects palette hex / toHaveStyle / Emotion snapshots after a visual-only
-  styling change; reviewer asks for more hex/border/sx coverage.
-hits: 2
-last_seen: 2026-09-22
+  expects palette hex / toHaveStyle / Emotion snapshots / mobile Save-Cancel
+  order / attach padding after a visual-only change; parent prompt asks for
+  a Jest test of chrome; reviewer asks for more hex/border/sx/layout coverage.
+hits: 3
+last_seen: 2026-11-02
 source: teach-review
 ```
 
-Mechanism: Excel and React styling fixes (lighter gray, borders, graph mask opacity, palette pad) invite hex-/stylesheet-/`sx`-pinning tests that churn on every design tweak and do not protect domain rules (when to gray a row or show an offline band, omit a column, treat online=0).
+Mechanism: Excel and React styling/layout fixes (lighter gray, borders, graph mask opacity, palette pad, mobile footer order, attach spacing) invite hex-/stylesheet-/`sx`-/DOM-order-pinning tests that churn on every design tweak and do not protect domain rules (when to gray a row or show an offline band, omit a column, treat online=0, mutation payloads, guards). Consumer `testing-conventions` that still showcase `describe("rendering")` must not override T1.
 
 Required check: [business-logic-tests-checklist.md](business-logic-tests-checklist.md) **T1** (explicitly includes React / Jest / Testing Library).
