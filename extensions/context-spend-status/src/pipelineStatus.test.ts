@@ -3,21 +3,43 @@ import assert from "node:assert/strict";
 import path from "node:path";
 import { resolvePipelineStatusHelper } from "./pipelineStatus";
 
-test("prefers the workspace helper", () => {
+test("prefers the workspace helper when it is current", () => {
   const root = "/workspace/project";
   const home = "/home/tester";
+  const body = "#!/bin/bash\nps__advance_stale_plan_ledger() { :; }\n";
   const files = new Map<string, string>([
-    [path.join(root, "scripts", "pipeline-status.sh"), "#!/bin/bash"],
+    [path.join(root, "scripts", "pipeline-status.sh"), body],
     [
       path.join(root, ".cursor", "cursor-spells-kit-path"),
       "/opt/loregate\n",
     ],
-    [path.join("/opt/loregate", "scripts", "pipeline-status.sh"), "#!/bin/bash"],
+    [path.join("/opt/loregate", "scripts", "pipeline-status.sh"), body],
   ]);
 
   assert.equal(
     resolvePipelineStatusHelper(root, home, (filePath) => files.get(filePath) ?? null),
     path.join(root, "scripts", "pipeline-status.sh")
+  );
+});
+
+test("prefers kit helper when workspace copy is stale", () => {
+  const root = "/workspace/project";
+  const home = "/home/tester";
+  const files = new Map<string, string>([
+    [path.join(root, "scripts", "pipeline-status.sh"), "#!/bin/bash\n# old\n"],
+    [
+      path.join(root, ".cursor", "cursor-spells-kit-path"),
+      "/opt/loregate\n",
+    ],
+    [
+      path.join("/opt/loregate", "scripts", "pipeline-status.sh"),
+      "#!/bin/bash\nps__advance_stale_plan_ledger() { :; }\n",
+    ],
+  ]);
+
+  assert.equal(
+    resolvePipelineStatusHelper(root, home, (filePath) => files.get(filePath) ?? null),
+    path.join("/opt/loregate", "scripts", "pipeline-status.sh")
   );
 });
 

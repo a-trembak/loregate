@@ -12,16 +12,11 @@ export type PipelineOrientation = {
 
 type ReadFile = (filePath: string) => string | null;
 
-export function resolvePipelineStatusHelper(
+function resolveKitPipelineStatusHelper(
   root: string,
   homedir: string,
   readFile: ReadFile
 ): string | null {
-  const workspaceHelper = path.join(root, "scripts", "pipeline-status.sh");
-  if (readFile(workspaceHelper) !== null) {
-    return workspaceHelper;
-  }
-
   const markerPaths = [
     path.join(root, ".cursor", "cursor-spells-kit-path"),
     path.join(homedir, ".cursor", "cursor-spells-kit-path"),
@@ -40,6 +35,34 @@ export function resolvePipelineStatusHelper(
   }
 
   return null;
+}
+
+export function resolvePipelineStatusHelper(
+  root: string,
+  homedir: string,
+  readFile: ReadFile
+): string | null {
+  const workspaceHelper = path.join(root, "scripts", "pipeline-status.sh");
+  const workspaceBody = readFile(workspaceHelper);
+  const kitHelper = resolveKitPipelineStatusHelper(root, homedir, readFile);
+  const kitBody = kitHelper !== null ? readFile(kitHelper) : null;
+
+  // Prefer kit when the project copy is missing newer orientation helpers
+  // (consumer installs often leave a stale scripts/pipeline-status.sh).
+  if (
+    workspaceBody !== null &&
+    kitBody !== null &&
+    !workspaceBody.includes("ps__advance_stale_plan_ledger") &&
+    kitBody.includes("ps__advance_stale_plan_ledger")
+  ) {
+    return kitHelper;
+  }
+
+  if (workspaceBody !== null) {
+    return workspaceHelper;
+  }
+
+  return kitHelper;
 }
 
 export async function fetchPipelineOrientation(

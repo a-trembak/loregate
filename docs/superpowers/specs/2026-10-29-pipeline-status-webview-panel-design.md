@@ -1,38 +1,46 @@
-# Pipeline status Webview panel (Agent Window)
+# Pipeline status map (Agent Window Canvas + Webview)
 
 ## Status
 
-`approved` — human approved in chat (command-first panel for Agent Window; Activity Bar icon optional).
+`approved` — human approved command-first Webview, then approved **Canvas pivot** for Agent Window (chat: Canvas path / “yes”).
 
 ## Goal
 
-Show a live green / here / waiting / blocked pipeline tree in Cursor without spending agent tokens. Humans working mainly in Agent Window open the map via a command; an Activity Bar icon is a convenience when the side bar is visible.
+Show a live green / here / waiting / blocked pipeline tree in Cursor without spending agent tokens. Agent Window does not host extension Activity Bar icons, so the **primary** surface there is an Agent Window **Canvas** file rewritten on disk. The Webview command remains for the editor layout.
 
-Success: after `lgt install` / Reload Window, **Loregate: Show Pipeline Map** opens a Webview that polls `pipeline-status.sh --json` ~every 3s and paints layer/stage state. No Canvas. No dependency on the system status bar (`Mem` / `FPS`).
+Success: after `lgt install` / Reload Window, the extension (or `scripts/pipeline-map-canvas.sh`) writes `loregate-pipeline-status.canvas.tsx` under `~/.cursor/projects/<workspace-id>/canvases/`. Opening that canvas beside chat shows the map; disk rewrites hot-reload with **no agent tokens**. Optional: **Loregate: Show Pipeline Map** still opens the Webview panel. Legacy filename `loregate-pipeline-map.canvas.tsx` may remain from older hosts — ignore it.
 
 ## Decisions
 
 | Decision | Choice |
 |----------|--------|
-| Primary UX | Command `loregate.pipelineMap.show` → editor Webview panel (works when Activity Bar is hidden) |
-| Secondary UX | Activity Bar container **Loregate** + Webview view `loregate.pipelineMap` |
-| Status bar chip | Keep existing context-spend chip when the system status bar is visible; not required for this feature |
-| Location | Extend `extensions/context-spend-status/` (same install path) |
-| Data | `pipeline-status.sh --json` (route, layer, stage, `stages_entered`, `pending_gates`); optional run-log tail later |
-| Refresh | ~3s poll + workspace folder change; extension-only (zero model tokens) |
-| Tree states | `done` (green), `here` (current), `waiting` (ahead), `blocked` (pending human gate when stage matches pending) |
-| Loop (v1) | Current stage `local-diff-review-gate` (and similar) shown as `here`; blocked styling when a pending gate matches; full Loop counter can wait for richer run-log |
-| Install | Existing `lgt install` copy to `~/.cursor/extensions/loregate.loregate-context-spend-status-<ver>/` |
-| Out of scope | Native macOS menu bar; Canvas status; changing pipeline gate order |
+| Primary UX (Agent Window) | Canvas `loregate-pipeline-status.canvas.tsx` with embedded STATE; rewrite on change (~3s poll) |
+| Secondary UX | Command `loregate.pipelineMap.show` → editor Webview panel + optional Activity Bar view |
+| Status bar chip | Keep existing context-spend chip when the system status bar is visible; not required |
+| Location | Extend `extensions/context-spend-status/` (same install path); CLI `out/writeCanvasCli.js` + `scripts/pipeline-map-canvas.sh` |
+| Data | `pipeline-status.sh --json` → `buildPipelineTree` → canvas / HTML |
+| Refresh | ~3s extension poll + workspace folder change; fingerprint skip when tree unchanged |
+| Tree states | `done` (success), `here` (warning), `waiting` (info), `blocked` (danger) via Canvas `Stat` tones |
+| Loop (v1) | Current stage `local-diff-review-gate` shown as `here`; blocked when pending gate matches |
+| Install | `lgt install` → `~/.cursor/extensions/loregate.loregate-context-spend-status-<ver>/` |
+| Out of scope | Native macOS menu bar; agent-driven canvas edits; changing pipeline gate order |
 
 ## Rejected alternatives
 
 - Status-bar-only UI — rejected: Agent Window users often hide or miss the system status bar.
-- Canvas map refreshed by the agent — rejected: burns tokens.
+- Canvas refreshed by the **agent** each turn — rejected: burns tokens; disk rewrite from the extension/script is the fix.
+- Activity Bar icon as sole Agent Window entry — rejected: Agent Window reserves that chrome; icons do not appear.
 - Separate extension package — rejected for v1; extend the existing installable extension.
+
+## Canvas path
+
+`~/.cursor/projects/<sanitized-absolute-workspace>/canvases/loregate-pipeline-status.canvas.tsx`
+
+Example: workspace `/Users/ukad/loregate` → project id `Users-ukad-loregate`.
 
 ## Test plan
 
 - Unit: tree model from orientation JSON → expected node states.
-- Unit: HTML/render helpers stay free of agent calls.
-- Manual: Reload Window → run **Loregate: Show Pipeline Map** in a project with `.cursor/gates` → tree updates without chat turns.
+- Unit: canvas source embeds STATE, imports only `cursor/canvas`, no `fetch`.
+- Unit: canvases dir sanitization; write skip when fingerprint unchanged.
+- Manual: Reload Window → open the canvas link → tree updates without chat turns; optional Webview command still works.

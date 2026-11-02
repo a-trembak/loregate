@@ -591,7 +591,7 @@
           <div class="node hitl" tabindex="0" data-go="local-diff-review-gate" data-stage="local-diff-review-gate" data-layer="review" role="button">
             <div class="kind">7a · HITL Local Diff</div>
             <div class="label">local-diff-review-gate</div>
-            <div class="hint"><code>approve-diff</code> / <code>comment</code> · canvas after engineer-review</div>
+            <div class="hint"><code>approve-diff</code> / <code>comment</code> · Local Git Changes after engineer-review</div>
             <span class="open-detail">details →</span>
           </div>
           <div class="cycle-chip">↺ <code>comment</code> Loop → engineer-review → miss → Local Diff until <code>approve-diff</code></div>
@@ -1006,7 +1006,7 @@
           <div class="step-num">1</div>
           <div class="step-body auto">
             <h3>review-surface (thin orientation, not Local Diff canvas)</h3>
-            <p>Checkout the feature branch in each open folder. <code>SetActiveBranch</code> — the client’s diff / pull request tab. <strong>Not</strong> <code>create-pr</code>, <strong>not</strong> a GitHub pull request, <strong>not</strong> the Local Diff Review canvas (that opens later via <code>local-diff-review-gate</code> after engineer-review). When the branch has <strong>0 commits ahead of base</strong>, the tab may be empty — summarize the <strong>uncommitted</strong> working tree in chat (<code>git status</code> / <code>git diff</code>) if helpful. After you answer this gate, engineer-review starts; then Teach-review miss; then <code>local-diff-review-gate</code> → Loop on <code>comment</code> until <code>approve-diff</code> → <code>propose-commit</code>, docs, then create-pr.</p>
+            <p>Checkout the feature branch in each open folder. <code>SetActiveBranch</code> — the client’s diff / pull request tab. <strong>Not</strong> <code>create-pr</code>, <strong>not</strong> a GitHub pull request, <strong>not</strong> the later <code>local-diff-review-gate</code> (Local Git Changes after engineer-review; Local Diff Review plugin canvas optional). When the branch has <strong>0 commits ahead of base</strong>, the tab may be empty — summarize the <strong>uncommitted</strong> working tree in chat (<code>git status</code> / <code>git diff</code>) if helpful. After you answer this gate, engineer-review starts; then Teach-review miss; then <code>local-diff-review-gate</code> → Loop on <code>comment</code> until <code>approve-diff</code> → <code>propose-commit</code>, docs, then create-pr.</p>
           </div>
         </div>
         <div class="step">
@@ -1113,7 +1113,7 @@
           <div class="step-num">5</div>
           <div class="step-body hitl">
             <h3>Teach-review miss → local-diff-review-gate</h3>
-            <p>After a validated report: HITL <code>miss</code> / <code>project_secret</code> / <code>no_miss</code>. Then skill <code>local-diff-review-gate</code> — Local Diff Review canvas (<code>approve-diff</code> / <code>comment</code>). <strong>Loop:</strong> <code>comment</code> applies notes and re-dispatches engineer-review (and miss again), then local-diff-review-gate until <code>approve-diff</code>. <code>no_miss</code> does not skip this gate.</p>
+            <p>After a validated report: HITL <code>miss</code> / <code>project_secret</code> / <code>no_miss</code>. Then skill <code>local-diff-review-gate</code> — <strong>Local Git Changes</strong> (<code>approve-diff</code> / <code>comment</code>); Local Diff Review plugin canvas optional. <strong>Loop:</strong> <code>comment</code> applies notes and re-dispatches engineer-review (and miss again), then local-diff-review-gate until <code>approve-diff</code>. <code>no_miss</code> does not skip this gate.</p>
           </div>
         </div>
       </div>
@@ -1127,13 +1127,13 @@
     <section id="view-local-diff-review-gate" class="view" hidden>
       <button type="button" class="back" data-go="overview">← Overview</button>
       <h2 class="view-title">7a. local-diff-review-gate</h2>
-      <p class="view-desc">HITL <em>after</em> engineer-review and Teach-review miss — not at <code>review-gate</code>. Opens the Local Diff Review canvas (plugin <code>local-diff-review</code> / skill <code>review-local-diff</code>) when the tree is dirty and the plugin is installed. Never commits, pushes, or opens a pull request inside this gate.</p>
+      <p class="view-desc">HITL <em>after</em> engineer-review and Teach-review miss — not at <code>review-gate</code>. Shows dirty changes via Cursor <strong>Local Git Changes</strong> (<code>SetActiveBranch</code>). Plugin <code>local-diff-review</code> / skill <code>review-local-diff</code> is optional opt-in only. Never commits, pushes, or opens a pull request inside this gate.</p>
       <div class="detail-flow">
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-body auto">
             <h3>When</h3>
-            <p>Pipeline only (full, <code>--fast</code>, issue). Skip when the working tree is clean or the plugin is missing (chat fallback). Manual <code>/lgt-engineer-review</code> does not auto-start this gate.</p>
+            <p>Pipeline only (full, <code>--fast</code>, issue). Skip when the working tree is clean. Missing Local Diff Review plugin is fine — default surface is Local Git Changes. Manual <code>/lgt-engineer-review</code> does not auto-start this gate.</p>
           </div>
         </div>
         <div class="step">
@@ -1147,7 +1147,7 @@
               </div>
               <div class="branch">
                 <span class="token">comment</span>
-                <div class="then"><strong>Loop:</strong> apply canvas comments → re-dispatch <code>csp-engineer-reviewer</code> → Teach-review miss → this gate again<small>until <code>approve-diff</code></small></div>
+                <div class="then"><strong>Loop:</strong> apply chat notes (optional plugin canvas) → re-dispatch <code>csp-engineer-reviewer</code> → Teach-review miss → this gate again<small>until <code>approve-diff</code></small></div>
               </div>
             </div>
           </div>

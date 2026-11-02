@@ -19,6 +19,10 @@ import {
   metricsForSession,
 } from "./snapshots";
 import { buildPipelineTree, type PipelineTree } from "./treeModel";
+import {
+  sealLegacyPipelineMapCanvas,
+  writePipelineMapCanvas,
+} from "./writePipelineMapCanvas";
 
 const SHOW_SPEND_COMMAND = "loregate.contextSpend.show";
 const SHOW_MAP_COMMAND = "loregate.pipelineMap.show";
@@ -29,6 +33,15 @@ let statusItem: vscode.StatusBarItem | undefined;
 let outputChannel: vscode.OutputChannel | undefined;
 let registeredDisposables: vscode.Disposable[] = [];
 let lastTree: PipelineTree = emptyTree();
+let lastCanvasPath: string | undefined;
+
+function syncPipelineMapCanvas(root: string, tree: PipelineTree): void {
+  sealLegacyPipelineMapCanvas(root, os.homedir());
+  const written = writePipelineMapCanvas(root, os.homedir(), tree);
+  if (written !== null) {
+    lastCanvasPath = written;
+  }
+}
 
 export function activate(context: vscode.ExtensionContext): void {
   statusItem = vscode.window.createStatusBarItem(
@@ -56,6 +69,16 @@ export function activate(context: vscode.ExtensionContext): void {
       await refresh();
       revealOrCreatePipelineMapPanel(lastTree, context.extensionUri);
       await focusPipelineMapView();
+      if (lastCanvasPath !== undefined) {
+        try {
+          const doc = await vscode.workspace.openTextDocument(
+            vscode.Uri.file(lastCanvasPath)
+          );
+          await vscode.window.showTextDocument(doc, { preview: true });
+        } catch {
+          // Canvas open is best-effort; Webview panel remains available.
+        }
+      }
     }
   );
 
@@ -83,6 +106,11 @@ export function activate(context: vscode.ExtensionContext): void {
         lastOutput = unavailableOutput("");
         lastTree = emptyTree("No workspace folder with Loregate gates is open.");
         updatePipelineMapSurfaces(lastTree);
+        const fallbackRoot =
+          vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (fallbackRoot !== undefined) {
+          syncPipelineMapCanvas(fallbackRoot, lastTree);
+        }
         return;
       }
 
@@ -104,6 +132,7 @@ export function activate(context: vscode.ExtensionContext): void {
         lastOutput = unavailableOutput(snapshotsPath);
         lastTree = emptyTree(orientation.error);
         updatePipelineMapSurfaces(lastTree);
+        syncPipelineMapCanvas(root, lastTree);
         return;
       }
 
@@ -154,6 +183,7 @@ export function activate(context: vscode.ExtensionContext): void {
         hasPipeline: orientation.hasPipeline,
       });
       updatePipelineMapSurfaces(lastTree);
+      syncPipelineMapCanvas(root, lastTree);
     } finally {
       refreshInFlight = false;
     }

@@ -42,7 +42,7 @@ Canonical UX for closed-set HITL questions. **Always attempt interactive buttons
    - `revise` → wait for change description (or file edit), then continue the calling skill
    - `skip` on tech-spec → wait for `<reason>` if not already provided
    - `fixes` (finish-plan) → wait for the fix description, implement/fix, re-ask the gate
-   - `comment` (Local Diff Review gate) → follow skill `local-diff-review-gate` / plugin `review-local-diff` in this thread; wait for outbound Send or pasted JSON
+   - `comment` (Local Diff Review gate) → follow skill `local-diff-review-gate`: wait for chat notes (Local Git Changes); optional plugin `review-local-diff` only if the human asks
    - `have_urls` (Figma) → wait for pasted node URLs; when they arrive, if Figma Model Context Protocol tools are missing, ask **Enable Figma MCP** before any Figma call
    - Unsolicited Figma URL paste mid-pipeline → same **Enable Figma MCP** check before using the links
    - `figma_enabled` (Enable Figma MCP) → human toggles Customize → MCPs → figma, then continue; re-check tools once

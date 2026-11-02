@@ -382,7 +382,8 @@ install_context_spend_status_extension() {
     cp -R "$ext_src/media" "$ext_dest/media"
   fi
   echo "copied: $ext_dest"
-  echo "hint: Reload Window, then Command Palette → Loregate: Show Pipeline Map"
+  echo "hint: Reload Window, then open Agent Window canvas loregate-pipeline-status.canvas.tsx"
+  echo "hint: if the canvas clock freezes in Agent Window, run: bash \"$KIT_ROOT/scripts/pipeline-map-canvas-watch.sh\" --root <project>"
 }
 
 

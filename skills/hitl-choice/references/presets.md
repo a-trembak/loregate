@@ -73,7 +73,7 @@ Ask only after the human chose `agent` on Tech-spec entry. Do not ask in `human`
 | `done` | Done reviewing — start review |
 | `fixes` | Describe fixes first |
 
-`approve` and `done` are equivalent. `fixes` is the structured stand-in for “or describe fixes first”; after selection, wait for the description. Question prompt stays thin: start review now, or describe fixes first — do **not** lead with “If a Local Diff Review canvas is open…”. Local Diff Review gate runs **after** engineer-review settles (Teach-review miss, then canvas `approve-diff` / `comment`). Asking this gate does **not** end the pipeline: after `skip` / `approve` / `done`, engineer-review starts. Do not invoke `create-pr` here.
+`approve` and `done` are equivalent. `fixes` is the structured stand-in for “or describe fixes first”; after selection, wait for the description. Question prompt stays thin: start review now, or describe fixes first — do **not** lead with “If a Local Diff Review canvas is open…”. Local Diff Review gate runs **after** engineer-review settles (Teach-review miss, then Local Git Changes `approve-diff` / `comment`; plugin canvas optional). Asking this gate does **not** end the pipeline: after `skip` / `approve` / `done`, engineer-review starts. Do not invoke `create-pr` here.
 
 ### Figma ask (frontend)
 
@@ -246,12 +246,14 @@ After `no_miss`, after skill `teach-review` returns (success or failure), or aft
 
 Ask from skill `local-diff-review-gate` on the **pipeline** path only, after Teach-review miss is handled and **before** each `propose-commit` while `git diff HEAD` or `git diff --cached` is non-empty (and again before residual propose-commit if docs left the tree dirty). Never ask from manual `/lgt-engineer-review` unless the human requested it. Never treat this as Pipeline finale or as `approve-commit`.
 
+Primary surface: Cursor **Local Git Changes** after `SetActiveBranch` (not the Local Diff Review plugin canvas). Plugin canvas only if the human opts in.
+
 | id | label |
 |----|-------|
 | `approve-diff` | Diff is fine — continue to propose-commit |
-| `comment` | Open Local Diff Review canvas and wait for Send |
+| `comment` | Send change notes in this chat (Local Git Changes); optional Local Diff Review canvas only if asked |
 
-On `comment`, the calling skill follows plugin `review-local-diff` in **this thread**, applies pasted `local-diff-review/comments` via nested Task `csp-software-developer` without committing, then **returns** `next_skill: engineer-review` — the pipeline caller must re-run engineer-review (Loop); do **not** ask `approve-diff` / `comment` once more in the same turn. Green path: human `approve-diff` → gate returns `next_skill: propose-commit` → caller may invoke skill `propose-commit`.
+On `comment`, the calling skill waits for chat notes in **this thread** (or, only if requested, plugin `review-local-diff` / paste `local-diff-review/comments`), applies them via nested Task `csp-software-developer` without committing, then **returns** `next_skill: engineer-review` — the pipeline caller must re-run engineer-review (Loop); do **not** ask `approve-diff` / `comment` once more in the same turn. Green path: human `approve-diff` → gate returns `next_skill: propose-commit` → caller may invoke skill `propose-commit`.
 
 ### Capture-escape destination
 

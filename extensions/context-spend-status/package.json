@@ -2,7 +2,7 @@
   "name": "loregate-context-spend-status",
   "displayName": "Loregate Pipeline Status",
   "description": "Pipeline map Webview and context-spend status for Loregate",
-  "version": "0.1.0",
+  "version": "0.3.2",
   "publisher": "loregate",
   "engines": {
     "vscode": "^1.85.0"
