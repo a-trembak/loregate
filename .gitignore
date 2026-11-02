@@ -8,3 +8,6 @@
 
 __pycache__/
 *.py[cod]
+
+# Local pipeline gate markers (machine-local)
+.cursor/gates/
